@@ -20,8 +20,11 @@ target 'SonGil_FE' do
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
-    :app_path => "#{Pod::Config.instance.installation_root}/.."
+    :app_path => "#{Pod::Config.instance.installation_root}/..",
+    :new_arch_enabled => false
   )
+
+  pod 'React-Codegen', :path => '../node_modules/react-native/ReactCommon'
 
   target 'SonGil_FETests' do
     inherit! :complete

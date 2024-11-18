@@ -1,0 +1,40 @@
+const mockTasks = [
+  {
+    id: '1',
+    title: '회의 준비',
+    date: '2024-11-17',
+    startTime: '10:00',
+    endTime: '11:30',
+    isAllDay: false,
+    repeat: 'none',
+    isAlarmOn: true,
+    location: '회의실 A',
+    memo: '회의 자료 준비',
+  },
+  {
+    id: '2',
+    title: '점심 약속',
+    date: '2024-11-17',
+    startTime: '12:30',
+    endTime: '13:30',
+    isAllDay: false,
+    repeat: 'none',
+    isAlarmOn: false,
+    location: '근처 식당',
+    memo: '',
+  },
+  {
+    id: '3',
+    title: '운동',
+    date: '2024-11-17',
+    startTime: '18:00',
+    endTime: '19:00',
+    isAllDay: false,
+    repeat: 'weekly',
+    isAlarmOn: true,
+    location: '헬스장',
+    memo: '유산소 + 웨이트',
+  },
+];
+
+export default mockTasks;
