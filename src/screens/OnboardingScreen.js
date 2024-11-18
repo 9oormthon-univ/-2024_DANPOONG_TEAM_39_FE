@@ -4,7 +4,7 @@ import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 const OnboardingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>일정을 쉽게 관리할 수 있어요</Text>
+      <Text style={styles.text}>일정을 쉽게 관리할 수 있어요!!</Text>
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.replace("HomeScreen")} // HomeScreen으로 이동
