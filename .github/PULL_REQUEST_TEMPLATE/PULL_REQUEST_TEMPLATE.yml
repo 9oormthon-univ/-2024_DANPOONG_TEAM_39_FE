@@ -1,0 +1,18 @@
+name: "PR"
+description: "새로운 기능 추가 및 연관된 작업 정리"
+body:
+  - type: textarea
+    attributes:
+      label: "#️⃣ 연관된 이슈"
+      description: 연관된 이슈 번호를 적어주세요. 예: #123, #456
+      placeholder: 예: #이슈번호, #이슈번호
+  - type: textarea
+    attributes:
+      label: "📝 작업 내용"
+      description: 이번 PR에서 작업한 내용을 간략히 설명해주세요.
+      placeholder: ex) 기능 추가
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: "### 스크린샷 (선택)\n이미지 첨부가 필요하면 아래에 추가해 주세요."
