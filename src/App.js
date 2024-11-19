@@ -1,4 +1,4 @@
-import çReact from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { enableScreens } from 'react-native-screens'; // react-native-screens 활성화
