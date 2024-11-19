@@ -13,7 +13,7 @@ export default function SplashScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/app_icon.png')} style={styles.image} />
+      <Image source={require('../assets/images/icon_songil.png')} style={styles.image} />
     </View>
   );
 }

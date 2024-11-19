@@ -1,9 +1,9 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
-import SvgIcon from "../../assets/images/kakao_icon.svg"; // SVG 컴포넌트로 불러오기
+import SvgIcon from "../../assets/images/icon_kakao.svg"; // SVG 컴포넌트로 불러오기
 import textStyles from "../../styles/textStyles"; // 텍스트 스타일 불러오기
 
-const KakaoButton = ({ onPress }) => {
+const KakaologinButton = ({ onPress }) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <View style={styles.content}>
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 52, // 화면 하단에서 52dp 떨어짐
     width: "90%", // 화면 너비의 90% 차지
-    height: 62,
+    height: 64,
     backgroundColor: "#FEE500", // Kakao yellow
     borderRadius: 16,
     justifyContent: "center", // 버튼 안에서 수직 중앙 정렬
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default KakaoButton;
+export default KakaologinButton;

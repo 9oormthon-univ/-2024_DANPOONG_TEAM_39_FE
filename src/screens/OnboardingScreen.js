@@ -1,11 +1,11 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import KakaoButton from "../components/atoms/AbledButton";
+import AbledButton from "../components/atoms/AbledButton";
 
 const OnboardingScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <KakaoButton onPress={() => navigation.replace("HomeScreen")} text="시작하기"/>
+      <AbledButton onPress={() => navigation.replace("LoginScreen")} text="시작하기"/>
     </View>
   );
 };
