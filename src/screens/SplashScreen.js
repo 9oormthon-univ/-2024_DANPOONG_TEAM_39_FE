@@ -14,7 +14,7 @@ export default function SplashScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/logo.png')} style={styles.image} />
+      <Image source={require('../assets/images/app_icon.png')} style={styles.image} />
       <Text style={textStyles.title18Bold}>손길 : 손 쉬운 돌봄 길라잡이</Text>
     </View>
   );
