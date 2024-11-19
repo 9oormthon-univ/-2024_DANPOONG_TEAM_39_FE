@@ -7,7 +7,7 @@ export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace('OnboardingScreen');
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [navigation]);
@@ -15,7 +15,6 @@ export default function SplashScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Image source={require('../assets/images/app_icon.png')} style={styles.image} />
-      <Text style={textStyles.title18Bold}>손길 : 손 쉬운 돌봄 길라잡이</Text>
     </View>
   );
 }
@@ -30,7 +29,6 @@ const styles = StyleSheet.create({
   image: {
     width: 96,
     height: 96,
-    marginBottom: 20,
     marginLeft: 132,
     marginRight: 132,
     alignSelf: 'center',
