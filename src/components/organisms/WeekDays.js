@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import moment from 'moment';
+import colors from '../../styles/colors';
+import fonts from '../../styles/fonts';
 
 const WeekDays = ({ currentWeek }) => {
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // 선택된 날짜
@@ -73,34 +75,32 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: 12,
-    fontFamily: 'Pretendard-SemiBold',
-    fontWeight: '600',
+    fontFamily: fonts.medium,
     lineHeight: 25,
   },
   dateText: {
     fontSize: 16,
-    fontFamily: 'Pretendard-SemiBold',
-    fontWeight: '600',
+    fontFamily: fonts.semiBold,
     lineHeight: 19,
   },
   // 요일/날짜 스타일
   sundayText: {
-    color: '#FF7F66',
+    color: colors.secondary002,
   },
   sundayDateText: {
-    color: '#FF5500',
+    color: colors.secondary001,
   },
   saturdayText: {
-    color: '#FFB266',
+    color: colors.primary002,
   },
   saturdayDateText: {
-    color: '#FF7F00',
+    color: colors.primary001,
   },
   weekdayText: {
-    color: '#686664',
+    color: colors.gray700,
   },
   weekdayDateText: {
-    color: '#343332',
+    color: colors.gray900,
   },
   // 선택된 날짜 스타일
   selectedContainer: {
