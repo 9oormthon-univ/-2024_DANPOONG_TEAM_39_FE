@@ -21,6 +21,7 @@ const HomeScreen = () => {
   const [viewMode, setViewMode] = useState('주');
 
   const handleViewChange = (newView) => {
+    console.log('ViewMode :', newView); // 상태 확인
     setViewMode(newView);
   };
 
@@ -67,12 +68,13 @@ const HomeScreen = () => {
 
       <ScrollView
         style={styles.scrollContainer}
+        contentContainerStyle={{ flexGrow: 1 }} // 레이아웃 충돌 방지
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
       >
-        <View style={styles.content}>
+        <View style={{ flex: 1 }}> {/* ScrollView 내부 부모 뷰에 flex: 1 추가 */}
           {viewMode === '주' ? (
             <>
               {hours.map((hour) => (
