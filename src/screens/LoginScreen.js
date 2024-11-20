@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white000, // 배경색을 colors.js에서 불러오기
     justifyContent: "center", // 수직 중앙 정렬
     alignItems: "center", // 수평 중앙 정렬
-    paddingHorizontal: 20, // 좌우 여백
+    paddingHorizontal: 0, // 좌우 여백
   },
   textContainer: {
     marginBottom: 20, // 이미지와 상단 텍스트 사이 간격
