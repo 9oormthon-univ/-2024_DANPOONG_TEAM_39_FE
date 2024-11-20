@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Animated, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import GnbPlusIcon from '../../assets/images/gnb_plus.svg'; // 플러스 아이콘
@@ -15,6 +15,7 @@ const FloatingButton = () => {
   const [isMenuVisible, setMenuVisible] = useState(false); // 메뉴 상태
   const animationValue = useState(new Animated.Value(0))[0]; // 애니메이션 값 관리
   const navigation = useNavigation();
+  const buttonPosition = useRef({ bottom: 20, right: 20 }).current; // 플로팅 버튼의 위치
 
   // 메뉴 열기 애니메이션
   const openMenu = () => {
@@ -49,7 +50,14 @@ const FloatingButton = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={(event) => {
+        const { x, y, width, height } = event.nativeEvent.layout;
+        buttonPosition.bottom = 20;
+        buttonPosition.right = 20;
+      }}
+    >
       {/* 모달 */}
       {isMenuVisible && (
         <Modal transparent={true} visible={isMenuVisible} animationType="fade">
@@ -59,7 +67,15 @@ const FloatingButton = () => {
           </TouchableOpacity>
 
           {/* 드롭다운 메뉴와 플로팅 버튼 */}
-          <View style={styles.modalContent}>
+          <View
+            style={[
+              styles.modalContent,
+              {
+                bottom: buttonPosition.bottom, // 플로팅 버튼 위치를 기준으로 모달 정렬
+                right: buttonPosition.right,
+              },
+            ]}
+          >
             <Animated.View
               style={[
                 styles.menuContainer,
@@ -133,7 +149,6 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     alignItems: 'center',
-    marginRight: 5,
   },
   overlay: {
     position: 'absolute',
@@ -144,12 +159,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.66)', // 반투명 배경
   },
   modalContent: {
-    flex: 1,
+    position: 'absolute',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginLeft: 260,
-    marginBottom: 20,
-    marginRight: Platform.OS === 'ios' ? -30: 10,
   },
   menuContainer: {
     width: 60,
@@ -159,8 +171,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingBottom:6,
-    bottom: -45,
+    paddingBottom: 6,
+    bottom: -40,
   },
   menuItem: {
     marginTop: 10,
@@ -168,7 +180,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     width: '100%',
-    
   },
   menuText: {
     marginTop: 0,
@@ -194,7 +205,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
-    
   },
 });
 
