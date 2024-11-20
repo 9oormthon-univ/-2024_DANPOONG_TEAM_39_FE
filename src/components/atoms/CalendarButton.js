@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import fonts from '../../styles/fonts';
 
-const CalendarButton = () => {
+const CalendarButton = ({ onChangeView = () => {} }) => {
   const [buttonText, setButtonText] = useState('주'); // 초기 텍스트는 '주'
 
   const handlePress = () => {
-    setButtonText((prevText) => (prevText === '주' ? '일' : '주'));
+    const newText = buttonText === '주' ? '일' : '주';
+    setButtonText(newText);
+    onChangeView(newText); // 버튼 상태 변경 시 호출
   };
 
   return (
@@ -18,18 +20,18 @@ const CalendarButton = () => {
 
 const styles = StyleSheet.create({
   button: {
-    width: 45, // 버튼 너비
-    height: 32, // 버튼 높이
-    justifyContent: 'center', // 수직 중앙 정렬
-    alignItems: 'center', // 수평 중앙 정렬
-    backgroundColor: '#F3F3F2', // 버튼 배경색
-    borderRadius: 50, // 버튼 모서리 둥글게 설정
+    width: 45,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F3F3F2',
+    borderRadius: 50,
   },
   text: {
-    fontSize: 14, // 텍스트 크기
-    fontFamily: fonts.semiBold, // SemiBold 스타일
-    lineHeight: 24, // 피그마에서 지정된 Line Height
-    color: '#000', // 텍스트 색상
+    fontSize: 14,
+    fontFamily: fonts.semiBold,
+    lineHeight: 24,
+    color: '#000',
   },
 });
 
