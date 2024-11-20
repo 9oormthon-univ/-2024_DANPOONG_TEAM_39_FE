@@ -9,7 +9,7 @@ const LoginScreen = ({ navigation }) => {
       {/* 상단 텍스트 */}
       <View style={styles.textContainer}>
         <Text style={styles.title}>손쉬운 돌봄 길라잡이,</Text>
-        <Text style={styles.subtitle}>손길과 함께해요!</Text>
+        <Text style={styles.subtitle}>손길과 함께해요!!</Text>
       </View>
       {/* 중앙에 이미지 */}
       <Image
