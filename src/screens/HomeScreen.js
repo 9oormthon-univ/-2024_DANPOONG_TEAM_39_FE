@@ -68,13 +68,15 @@ const HomeScreen = () => {
 
       <ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{ flexGrow: 1 }} // 레이아웃 충돌 방지
+        contentContainerStyle={{ flexGrow: 1 }} // 내용이 부족해도 스크롤이 가능하게 함
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
+        keyboardShouldPersistTaps="handled" // 키보드 관련 스크롤 이슈 해결
+        nestedScrollEnabled={true} // 자식 ScrollView가 스크롤 가능하게 함
       >
-        <View style={{ flex: 1 }}> {/* ScrollView 내부 부모 뷰에 flex: 1 추가 */}
+        <View style={styles.content}>
           {viewMode === '주' ? (
             <>
               {hours.map((hour) => (

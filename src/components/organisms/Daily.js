@@ -1,24 +1,29 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
 const Daily = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>일별 일정 테스트</Text>
-    </View>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      nestedScrollEnabled={true} // 부모 ScrollView와 충돌 방지
+    >
+      <Text style={styles.text}>오늘의 일정 테스트</Text>
+      {/* 추가 내용 */}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // 부모 컨테이너 안에서 공간을 차지하도록 설정
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FF0000', // 빨간색 배경
+    backgroundColor: 'red', // 배경색 확인용
   },
   text: {
     fontSize: 20,
-    color: '#FFFFFF', // 흰색 텍스트
+    fontWeight: 'bold',
+    color: '#333333',
   },
 });
 
