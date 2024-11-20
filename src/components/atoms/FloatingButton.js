@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
     alignItems: 'center',
+    marginRight: 5,
   },
   overlay: {
     position: 'absolute',
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    backgroundColor: 'rgba(0, 0, 0, 0.66)', // 반투명 배경
   },
   modalContent: {
     flex: 1,
@@ -148,6 +149,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 260,
     marginBottom: 20,
+    marginRight: Platform.OS === 'ios' ? -30: 10,
   },
   menuContainer: {
     width: 60,
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 4,
     width: '100%',
+    
   },
   menuText: {
     marginTop: 0,
@@ -191,6 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,
+    
   },
 });
 

@@ -23,9 +23,6 @@ target 'SonGil_FE' do
     :app_path => "#{Pod::Config.instance.installation_root}/..",
     :new_arch_enabled => false
   )
-
-  pod 'React-Codegen', :path => '../node_modules/react-native/ReactCommon'
-
   target 'SonGil_FETests' do
     inherit! :complete
     # Pods for testing
