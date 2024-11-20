@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const Header = () => {
@@ -8,12 +8,12 @@ const Header = () => {
       <View style={styles.iconContainer}>
         {/* 알림 아이콘 */}
         <TouchableOpacity style={styles.icon}>
-          <Icon name="notifications-outline" size={24} color="white" />
+          <Image source={require('../../assets/images/bell.png')} />
         </TouchableOpacity>
 
         {/* 메뉴 아이콘 */}
         <TouchableOpacity style={styles.icon}>
-          <Icon name="menu" size={24} color="white" />
+          <Image source={require('../../assets/images/menu.png')} />
         </TouchableOpacity>
       </View>
     </View>
@@ -22,8 +22,6 @@ const Header = () => {
 
 const styles = StyleSheet.create({
   header: {
-    // width: 360,
-    // height: 56,
     flexDirection: 'row',
     paddingHorizontal: 10,  // 좌우 여백을 20px로 설정
     paddingVertical: 16,    // 상하 여백을 16px로 설정

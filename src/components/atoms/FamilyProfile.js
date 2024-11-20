@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import fonts from '../../styles/fonts';
 
 const FamilyProfile = ({ name, imagePath }) => {
   return (
@@ -29,8 +30,8 @@ const styles = StyleSheet.create({
     borderRadius: 32,
   },
   profileName: {
-    fontSize: 13,
-    fontFamily: 'Pretendard-Bold', // Bold 스타일을 사용하기 위해 'Pretendard-Bold'로 설정
+    fontSize: 14,
+    fontFamily: fonts.bold, // Bold 스타일을 사용하기 위해 'Pretendard-Bold'로 설정
     textAlign: 'center',
     lineHeight: 21,
     color: '#FFFFFF',

@@ -7,6 +7,7 @@ import WeekDays from '../components/organisms/WeekDays';
 import TimeLine from '../components/atoms/TimeLine';
 import TimeBlockList from '../components/organisms/TimeBlockList';
 import MockTasks from '../datas/MockTasks';
+import FloatingButton from '../components/atoms/\bFloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
 import colors from '../styles/colors';
@@ -60,11 +61,11 @@ const HomeScreen = () => {
         <FamilyList profiles={profiles} />
       </Animated.View>
 
-      {/* CalendarDatepicker 고정
+      {/* CalendarDatepicker 고정 */}
       <View style={styles.datePickerContainer}>
         <CalendarDatepicker currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
         <WeekDays currentWeek={currentWeek} />
-      </View>*/}
+      </View>
 
       {/* 타임블록 반복 렌더링 */}
       <ScrollView
@@ -83,6 +84,9 @@ const HomeScreen = () => {
           <TimeBlockList tasks={MockTasks} />
         </View>
       </ScrollView>
+
+      {/* 플로팅 카테고리 버튼 */}
+      <FloatingButton />
     </View>
   );
 };
