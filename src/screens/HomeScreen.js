@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Animated, ScrollView, StyleSheet } from 'react-native';
+import { View, Animated, ScrollView, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context'; // SafeAreaView 임포트
 import Header from '../components/templates/Header';
 import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
@@ -7,7 +8,7 @@ import WeekDays from '../components/organisms/WeekDays';
 import TimeLine from '../components/atoms/TimeLine';
 import TimeBlockList from '../components/organisms/TimeBlockList';
 import MockTasks from '../datas/MockTasks';
-import FloatingButton from '../components/atoms/\bFloatingButton';
+import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
 import colors from '../styles/colors';
@@ -48,7 +49,7 @@ const HomeScreen = () => {
   const hours = Array.from({ length: 24 }, (_, index) => index); // 0 ~ 23 생성
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
 
       {/* 애니메이션이 적용된 FamilyList 컴포넌트 */}
@@ -70,11 +71,13 @@ const HomeScreen = () => {
       {/* 타임블록 반복 렌더링 */}
       <ScrollView
         style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
       >
+        {/* 위클리 컴포넌트 렌더링 */}
         <View style={styles.content}>
           {hours.map((hour) => (
             <TimeLine key={hour} hour={hour} />
@@ -87,32 +90,32 @@ const HomeScreen = () => {
 
       {/* 플로팅 카테고리 버튼 */}
       <FloatingButton />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#FF7F00',
+    backgroundColor: colors.gray050,
   },
   familyListContainer: {
-    width: '100%', // FamilyList가 가로로 화면을 다 채우도록 설정
+    width: '100%',
     backgroundColor: '#FF7F00',
-    paddingHorizontal: 0, // 패딩을 없애서 여백 제거
+    paddingHorizontal: 0,
   },
   datePickerContainer: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20, // 왼쪽 상단 둥근 모서리
-    borderTopRightRadius: 20, // 오른쪽 상단 둥근 모서리
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     zIndex: 10,
   },
   scrollContainer: {
     flex: 1,
     backgroundColor: colors.gray050,
-    overflow: 'hidden', // 둥근 모서리가 유지되도록 overflow 설정
+  },
+  scrollContent: {
+    paddingBottom: 80, // 하단 여유 공간 추가
   },
   content: {
     paddingLeft: 10,
