@@ -35,7 +35,7 @@ const slides = [
 ];
 
 const OnboardingScreen = ({ navigation }) => {
-  const [setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
 
   // 인디케이터 컴포넌트
