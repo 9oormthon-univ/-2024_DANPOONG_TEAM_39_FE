@@ -1,4 +1,4 @@
-package com.songil_fe
+package com.songil
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -1,4 +1,4 @@
-package com.songil_fe
+package com.songil
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

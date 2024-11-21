@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather'; // Feather 아이콘 사용
 import DateTimePicker from '@react-native-community/datetimepicker'; // 날짜 선택기
 import moment from 'moment';
-import CalendarDaysIcon from '../../assets/images/calendar_days.svg'; // SVG로 불러오기
 import CalendarButton from '../atoms/CalendarButton';
+import colors from '../../styles/colors';
+import fonts from '../../styles/fonts';
 
 const CalendarDatepicker = ({ currentWeek, setCurrentWeek }) => {
   const [showDatePicker, setShowDatePicker] = useState(false); // 날짜 선택기 표시 여부 상태
@@ -56,7 +57,7 @@ const CalendarDatepicker = ({ currentWeek, setCurrentWeek }) => {
 
         {/* 캘린더 아이콘 */}
         <TouchableOpacity onPress={handleDatePicker} style={styles.calendarIconContainer}>
-          <CalendarDaysIcon width={24} height={24} />
+          <Image source={require('../../assets/images/calendar.png')} style={styles.calendarIcon} />
         </TouchableOpacity>
 
         {/* 오른쪽 Chevron 버튼 */}
@@ -116,13 +117,10 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16, // 텍스트 크기
-    fontFamily: 'Pretendard-Medium', // Pretendard 폰트 설정
+    fontFamily: fonts.semiBold, // Pretendard 폰트 설정
     textAlign: 'left', // 왼쪽 정렬
     lineHeight: 24, // 텍스트 줄 높이
-    color: '#000', // 텍스트 색상
-  },
-  calendarIconContainer: {
-    marginLeft: 4, // 캘린더 아이콘과 날짜 간격 조정
+    color: colors.gray900, // 텍스트 색상
   },
   todayButton: {
     width: 65, // 버튼 너비
@@ -136,10 +134,9 @@ const styles = StyleSheet.create({
     marginRight: 10, // Today 버튼과 주 버튼 간격 조정
   },
   todayButtonText: {
-
     color: '#FF7F00',
-    fontFamily: 'Pretendard-SemiBold',
-    fontWeight: '600', // SemiBold 스타일
+    fontFamily: fonts.semiBold,
+    fontWeight: '700', 
     lineHeight: 24, // 피그마에서 지정된 Line Height
     fontSize: 14,
   },

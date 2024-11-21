@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import fonts from '../../styles/fonts';
 
 const CalendarButton = () => {
   const [buttonText, setButtonText] = useState('주'); // 초기 텍스트는 '주'
@@ -26,10 +27,9 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14, // 텍스트 크기
-    fontWeight: '600', // SemiBold 스타일
+    fontFamily: fonts.semiBold, // SemiBold 스타일
     lineHeight: 24, // 피그마에서 지정된 Line Height
     color: '#000', // 텍스트 색상
-    fontFamily: 'Pretendard-SemiBold', // Pretendard SemiBold 사용
   },
 });
 

@@ -2,11 +2,11 @@ import React from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
 import FamilyProfile from '../atoms/FamilyProfile';
 
-const FamilyList = ({ profiles }) => {
+const FamilyList = ({ Profiles }) => {
   return (
     <View style={styles.container}>
       {/* 첫 번째 프로필을 고정 */}
-      <FamilyProfile name={profiles[0].name} imagePath={profiles[0].imagePath} />
+      <FamilyProfile name={Profiles[0].name} imagePath={Profiles[0].imagePath} />
 
       {/* 나머지 프로필들은 가로 스크롤 */}
       <ScrollView
@@ -14,7 +14,7 @@ const FamilyList = ({ profiles }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       >
-        {profiles.slice(1).map((profile, index) => (
+        {Profiles.slice(1).map((profile, index) => (
           <FamilyProfile key={index + 1} name={profile.name} imagePath={profile.imagePath} />
         ))}
       </ScrollView>
