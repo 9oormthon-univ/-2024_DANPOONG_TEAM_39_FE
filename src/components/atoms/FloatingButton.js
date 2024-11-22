@@ -13,9 +13,9 @@ import fonts from '../../styles/fonts';
 
 const FloatingButton = () => {
   const [isMenuVisible, setMenuVisible] = useState(false); // 메뉴 상태
-  const animationValue = useState(new Animated.Value(0))[0]; // 애니메이션 값 관리
+  const animationValue = useRef(new Animated.Value(0)).current; // 애니메이션 값 관리
   const navigation = useNavigation();
-  const buttonPosition = useRef({ bottom: 20, right: 20 }).current; // 플로팅 버튼의 위치
+  const buttonPosition = useRef({ bottom: 20, right: 20 }).current; // 플로팅 버튼 위치
 
   // 메뉴 열기 애니메이션
   const openMenu = () => {
@@ -33,64 +33,55 @@ const FloatingButton = () => {
       toValue: 0, // 닫힘 상태
       duration: 300,
       useNativeDriver: true,
-    }).start(() => setMenuVisible(false)); // 애니메이션 완료 후 상태 변경
+    }).start(() => setMenuVisible(false));
   };
 
- // 카테고리별 일정추가 클릭 핸들러
-const handleCategoryPress = (category) => {
-  closeMenu(); // 메뉴 닫기
-  switch (category) {
-    case 'meal':
-      navigation.navigate('AddMealTask', { selectedCategory: 'meal' }); // 식사 일정 추가 화면
-      break;
-    case 'hospital':
-      navigation.navigate('AddHospitalTask', { selectedCategory: 'hospital' }); // 병원 일정 추가 화면
-      break;
-    case 'medication':
-      navigation.navigate('AddPillTask', { selectedCategory: 'medication' }); // 복약 일정 추가 화면
-      break;
-    case 'rest':
-      navigation.navigate('AddRestTask', { selectedCategory: 'rest' }); // 휴식 일정 추가 화면
-      break;
-    case 'others':
-      navigation.navigate('AddOthersTask', { selectedCategory: 'others' }); // 기타 일정 추가 화면
-      break;
-    default:
-      console.warn('Unknown category:', category);
-      break;
-  }
-};
+  // 카테고리별 네비게이션
+  const categoryScreens = {
+    meal: 'AddMealTask',
+    hospital: 'AddHospitalTask',
+    medication: 'AddPillTask',
+    rest: 'AddRestTask',
+    others: 'AddOthersTask',
+  };
 
-  // 내 일정추가 핸들러
+  const handleCategoryPress = (category) => {
+    closeMenu();
+    const screenName = categoryScreens[category];
+    if (screenName) {
+      navigation.navigate(screenName, { selectedCategory: category });
+    } else {
+      console.warn('Unknown category:', category);
+    }
+  };
+
+  // 내 일정 추가 네비게이션
   const handleMyCalendarNavigation = () => {
     if (isMenuVisible) {
-      navigation.navigate('AddMyCalendar'); // 내 일정추가 화면으로 이동
+      navigation.navigate('AddMyCalendar');
     }
   };
 
   return (
     <View
       style={styles.container}
-      onLayout={(event) => {
-        const { x, y, width, height } = event.nativeEvent.layout;
+      onLayout={() => {
         buttonPosition.bottom = 20;
         buttonPosition.right = 20;
       }}
     >
       {/* 모달 */}
       {isMenuVisible && (
-        <Modal transparent={true} visible={isMenuVisible} animationType="fade">
+        <Modal transparent visible animationType="fade">
           {/* 모달 배경 */}
-          <TouchableOpacity style={styles.overlay} onPress={closeMenu}>
-            {/* 빈 터치 영역으로 닫기 */}
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.overlay} onPress={closeMenu} />
 
-          {/* 드롭다운 메뉴와 플로팅 버튼 */}
+          {/* 드롭다운 메뉴 */}
           <View
             style={[
               styles.modalContent,
               {
-                bottom: buttonPosition.bottom, // 플로팅 버튼 위치를 기준으로 모달 정렬
+                bottom: buttonPosition.bottom,
                 right: buttonPosition.right,
               },
             ]}
@@ -111,32 +102,36 @@ const handleCategoryPress = (category) => {
                 },
               ]}
             >
-              {/* 카테고리(카테고리별 일정 추가 화면(AddTask)으로 네비게이션) */} 
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('meal')}>
-                <CategoryMealIcon width={24} height={24} />
-                <Text style={styles.menuText}>식사</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('hospital')}>
-                <CategoryHospitalIcon width={24} height={24} />
-                <Text style={styles.menuText}>병원</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('medication')}>
-                <CategoryPillIcon width={24} height={24} />
-                <Text style={styles.menuText}>복약</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('rest')}>
-                <CategoryRestIcon width={24} height={24} />
-                <Text style={styles.menuText}>휴식</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('others')}>
-                <CategoryCheckIcon width={24} height={24} />
-                <Text style={styles.menuText}>기타</Text>
-              </TouchableOpacity>
+              {/* 카테고리 목록 */}
+              {Object.entries(categoryScreens).map(([key, screen]) => (
+                <TouchableOpacity
+                  key={key}
+                  style={styles.menuItem}
+                  onPress={() => handleCategoryPress(key)}
+                >
+                  {key === 'meal' && <CategoryMealIcon width={24} height={24} />}
+                  {key === 'hospital' && <CategoryHospitalIcon width={24} height={24} />}
+                  {key === 'medication' && <CategoryPillIcon width={24} height={24} />}
+                  {key === 'rest' && <CategoryRestIcon width={24} height={24} />}
+                  {key === 'others' && <CategoryCheckIcon width={24} height={24} />}
+                  <Text style={styles.menuText}>
+                    {key === 'meal'
+                      ? '식사'
+                      : key === 'hospital'
+                      ? '병원'
+                      : key === 'medication'
+                      ? '복약'
+                      : key === 'rest'
+                      ? '휴식'
+                      : '기타'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </Animated.View>
 
             {/* 플로팅 버튼 */}
             <TouchableOpacity
-              style={styles.floatingButton} // 내 일정 추가 화면으로 네비게이션
+              style={styles.floatingButton}
               onPress={isMenuVisible ? handleMyCalendarNavigation : openMenu}
             >
               {isMenuVisible ? (
@@ -152,7 +147,7 @@ const handleCategoryPress = (category) => {
         </Modal>
       )}
 
-      {/* 플로팅 버튼 (모달 비활성화시에도 항상 존재) */}
+      {/* 플로팅 버튼 */}
       {!isMenuVisible && (
         <TouchableOpacity style={styles.floatingButton} onPress={openMenu}>
           <GnbPlusIcon width={24} height={24} fill={colors.primary001} />
@@ -187,7 +182,6 @@ const styles = StyleSheet.create({
     height: 340,
     backgroundColor: '#FFF',
     borderRadius: 28,
-    overflow: 'hidden',
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingBottom: 6,
