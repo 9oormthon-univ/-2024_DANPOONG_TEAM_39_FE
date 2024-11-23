@@ -8,6 +8,7 @@ const CalendarButton = ({ onChangeView = () => {} }) => {
   const handlePress = () => {
     const newText = buttonText === '주' ? '일' : '주';
     setButtonText(newText);
+    //console.log('Button Pressed:', newText); // 상태 변경 확인
     onChangeView(newText); // 버튼 상태 변경 시 호출
   };
 

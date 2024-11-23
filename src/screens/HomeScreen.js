@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { View, Animated, ScrollView, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'; // SafeAreaView 임포트
+import { View, Animated, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/templates/Header';
 import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
@@ -21,10 +21,11 @@ const HomeScreen = () => {
 
   // 주 상태 관리
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
+  const [viewMode, setViewMode] = useState('week'); // 'week' 또는 'day' 상태 관리
+
   const weekDates = Array.from({ length: 7 }, (_, i) =>
     currentWeek.clone().add(i, 'days')
   );
-
 
   const familyListHeight = scrollY.interpolate({
     inputRange: [0, 100],
@@ -37,9 +38,6 @@ const HomeScreen = () => {
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
-
-  // 타임라인 시간 배열
-  const hours = Array.from({ length: 24 }, (_, index) => index); // 0 ~ 23 생성
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
@@ -55,12 +53,11 @@ const HomeScreen = () => {
       </Animated.View>
 
       {/* CalendarDatepicker + Weekdays 컴포넌트 */}
-
       <View style={styles.datePickerContainer}>
         <CalendarDatepicker
           currentWeek={currentWeek}
           setCurrentWeek={setCurrentWeek}
-          onChangeView={handleViewChange}
+          onChangeView={(newView) => setViewMode(newView === '주' ? 'week' : 'day')}
         />
         <WeekDays currentWeek={currentWeek} />
       </View>
@@ -73,23 +70,24 @@ const HomeScreen = () => {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        keyboardShouldPersistTaps="handled" // 키보드 관련 스크롤 이슈 해결
-        nestedScrollEnabled={true} // 자식 ScrollView가 스크롤 가능하게 함
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
       >
-
-        {/* 위클리 컴포넌트 렌더링 */}
-        <View style={styles.weeklyContent}>
-          {/* 타임블록 렌더링 */}
-          <View style={styles.timeblockContainer}>
-            <TimeBlockList tasks={MockTasks} weekDates={weekDates}/>
-          </View>
+        <View style={styles.content}>
+          {viewMode === 'week' ? (
+            <View style={styles.timeblockContainer}>
+              <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+            </View>
+          ) : (
+            <View style={styles.dailyContent}>
+              <DailySchedule tasks={MockTasks} selectedDate={moment()} />
+            </View>
+          )}
         </View>
       </ScrollView>
 
-      {/* 플로팅 카테고리 버튼 */}
       <FloatingButton />
     </SafeAreaView>
-
   );
 };
 
@@ -114,10 +112,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray050,
   },
   scrollContent: {
-    paddingBottom: 80, // 하단 여유 공간 추가
+    paddingBottom: 80,
     zIndex: 1,
   },
-  weeklyContent: {
+  content: {
     paddingLeft: 10,
   },
 });
