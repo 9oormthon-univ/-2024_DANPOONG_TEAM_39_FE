@@ -1,13 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { View, Animated, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/templates/Header';
 import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
-import TimeLine from '../components/atoms/TimeLine';
 import TimeBlockList from '../components/organisms/TimeBlockList';
 import DailySchedule from '../components/organisms/DailySchedule';
 import MockTasks from '../datas/MockTasks';
+import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -17,13 +18,14 @@ moment.locale('ko');
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
-  const [currentWeek, setCurrentWeek] = useState(moment().startOf('week'));
-  const [viewMode, setViewMode] = useState('주');
 
-  const handleViewChange = (newView) => {
-    console.log('ViewMode :', newView); // 상태 확인
-    setViewMode(newView);
-  };
+  // 주 상태 관리
+  const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
+  const [viewMode, setViewMode] = useState('week'); // 'week' 또는 'day' 상태 관리
+
+  const weekDates = Array.from({ length: 7 }, (_, i) =>
+    currentWeek.clone().add(i, 'days')
+  );
 
   const familyListHeight = scrollY.interpolate({
     inputRange: [0, 100],
@@ -37,15 +39,8 @@ const HomeScreen = () => {
     extrapolate: 'clamp',
   });
 
-  const profiles = [
-    { name: '김수한무거', imagePath: require('../assets/images/profile_me.png') },
-    { name: '박수한무거', imagePath: require('../assets/images/profile.png') },
-  ];
-
-  const hours = Array.from({ length: 24 }, (_, index) => index);
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
 
       <Animated.View
@@ -54,53 +49,52 @@ const HomeScreen = () => {
           { height: familyListHeight, opacity: familyListOpacity },
         ]}
       >
-        <FamilyList profiles={profiles} />
+        <FamilyList Profiles={Profiles} />
       </Animated.View>
 
+      {/* CalendarDatepicker + Weekdays 컴포넌트 */}
       <View style={styles.datePickerContainer}>
         <CalendarDatepicker
           currentWeek={currentWeek}
           setCurrentWeek={setCurrentWeek}
-          onChangeView={handleViewChange}
+          onChangeView={(newView) => setViewMode(newView === '주' ? 'week' : 'day')}
         />
         <WeekDays currentWeek={currentWeek} />
       </View>
 
+      {/* 일정 렌더링 */}
       <ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{ flexGrow: 1 }} // 내용이 부족해도 스크롤이 가능하게 함
+        contentContainerStyle={styles.scrollContent}
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
-        keyboardShouldPersistTaps="handled" // 키보드 관련 스크롤 이슈 해결
-        nestedScrollEnabled={true} // 자식 ScrollView가 스크롤 가능하게 함
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
       >
         <View style={styles.content}>
-          {viewMode === '주' ? (
-            <>
-              {hours.map((hour) => (
-                <TimeLine key={hour} hour={hour} />
-              ))}
-              <TimeBlockList tasks={MockTasks} />
-            </>
+          {viewMode === 'week' ? (
+            <View style={styles.timeblockContainer}>
+              <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+            </View>
           ) : (
-            <DailySchedule />
+            <View style={styles.dailyContent}>
+              <DailySchedule tasks={MockTasks} selectedDate={moment()} />
+            </View>
           )}
         </View>
       </ScrollView>
 
       <FloatingButton />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'stretch',
-    backgroundColor: '#FF7F00',
+    backgroundColor: colors.gray050,
   },
   familyListContainer: {
     width: '100%',
@@ -116,7 +110,10 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     backgroundColor: colors.gray050,
-    overflow: 'hidden',
+  },
+  scrollContent: {
+    paddingBottom: 80,
+    zIndex: 1,
   },
   content: {
     paddingLeft: 10,

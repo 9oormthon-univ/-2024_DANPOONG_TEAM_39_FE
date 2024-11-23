@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Animated, Modal } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import GnbPlusIcon from '../../assets/images/gnb_plus.svg'; // 플러스 아이콘
@@ -13,8 +13,9 @@ import fonts from '../../styles/fonts';
 
 const FloatingButton = () => {
   const [isMenuVisible, setMenuVisible] = useState(false); // 메뉴 상태
-  const animationValue = useState(new Animated.Value(0))[0]; // 애니메이션 값 관리
+  const animationValue = useRef(new Animated.Value(0)).current; // 애니메이션 값 관리
   const navigation = useNavigation();
+  const buttonPosition = useRef({ bottom: 20, right: 20 }).current; // 플로팅 버튼 위치
 
   // 메뉴 열기 애니메이션
   const openMenu = () => {
@@ -32,34 +33,59 @@ const FloatingButton = () => {
       toValue: 0, // 닫힘 상태
       duration: 300,
       useNativeDriver: true,
-    }).start(() => setMenuVisible(false)); // 애니메이션 완료 후 상태 변경
+    }).start(() => setMenuVisible(false));
   };
 
-  // 카테고리 클릭 핸들러
+  // 카테고리별 네비게이션
+  const categoryScreens = {
+    meal: 'AddMealTask',
+    hospital: 'AddHospitalTask',
+    medication: 'AddPillTask',
+    rest: 'AddRestTask',
+    others: 'AddOthersTask',
+  };
+
   const handleCategoryPress = (category) => {
     closeMenu();
-    navigation.navigate('AddTask', { category }); // 네비게이션 전달
+    const screenName = categoryScreens[category];
+    if (screenName) {
+      navigation.navigate(screenName, { selectedCategory: category });
+    } else {
+      console.warn('Unknown category:', category);
+    }
   };
 
-  // 연필 캘린더 아이콘 클릭 시 네비게이션
-  const handlePencilNavigation = () => {
+  // 내 일정 추가 네비게이션
+  const handleMyCalendarNavigation = () => {
     if (isMenuVisible) {
-      navigation.navigate('MyTasks'); // 원하는 화면으로 이동
+      navigation.navigate('AddMyCalendar');
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={() => {
+        buttonPosition.bottom = 20;
+        buttonPosition.right = 20;
+      }}
+    >
       {/* 모달 */}
       {isMenuVisible && (
-        <Modal transparent={true} visible={isMenuVisible} animationType="fade">
+        <Modal transparent visible animationType="fade">
           {/* 모달 배경 */}
-          <TouchableOpacity style={styles.overlay} onPress={closeMenu}>
-            {/* 빈 터치 영역으로 닫기 */}
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.overlay} onPress={closeMenu} />
 
-          {/* 드롭다운 메뉴와 플로팅 버튼 */}
-          <View style={styles.modalContent}>
+          {/* 드롭다운 메뉴 */}
+          <View
+            style={[
+              styles.modalContent,
+              {
+                bottom: buttonPosition.bottom,
+                right: buttonPosition.right,
+              },
+            ]}
+          >
             <Animated.View
               style={[
                 styles.menuContainer,
@@ -76,33 +102,37 @@ const FloatingButton = () => {
                 },
               ]}
             >
-              {/* 카테고리 */}
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('식사')}>
-                <CategoryMealIcon width={24} height={24} />
-                <Text style={styles.menuText}>식사</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('병원')}>
-                <CategoryHospitalIcon width={24} height={24} />
-                <Text style={styles.menuText}>병원</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('복약')}>
-                <CategoryPillIcon width={24} height={24} />
-                <Text style={styles.menuText}>복약</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('휴식')}>
-                <CategoryRestIcon width={24} height={24} />
-                <Text style={styles.menuText}>휴식</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={() => handleCategoryPress('기타')}>
-                <CategoryCheckIcon width={24} height={24} />
-                <Text style={styles.menuText}>기타</Text>
-              </TouchableOpacity>
+              {/* 카테고리 목록 */}
+              {Object.entries(categoryScreens).map(([key, screen]) => (
+                <TouchableOpacity
+                  key={key}
+                  style={styles.menuItem}
+                  onPress={() => handleCategoryPress(key)}
+                >
+                  {key === 'meal' && <CategoryMealIcon width={24} height={24} />}
+                  {key === 'hospital' && <CategoryHospitalIcon width={24} height={24} />}
+                  {key === 'medication' && <CategoryPillIcon width={24} height={24} />}
+                  {key === 'rest' && <CategoryRestIcon width={24} height={24} />}
+                  {key === 'others' && <CategoryCheckIcon width={24} height={24} />}
+                  <Text style={styles.menuText}>
+                    {key === 'meal'
+                      ? '식사'
+                      : key === 'hospital'
+                      ? '병원'
+                      : key === 'medication'
+                      ? '복약'
+                      : key === 'rest'
+                      ? '휴식'
+                      : '기타'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </Animated.View>
 
             {/* 플로팅 버튼 */}
             <TouchableOpacity
               style={styles.floatingButton}
-              onPress={isMenuVisible ? handlePencilNavigation : openMenu}
+              onPress={isMenuVisible ? handleMyCalendarNavigation : openMenu}
             >
               {isMenuVisible ? (
                 <View style={styles.iconWithText}>
@@ -117,7 +147,7 @@ const FloatingButton = () => {
         </Modal>
       )}
 
-      {/* 플로팅 버튼 (모달 외부에서 항상 존재) */}
+      {/* 플로팅 버튼 */}
       {!isMenuVisible && (
         <TouchableOpacity style={styles.floatingButton} onPress={openMenu}>
           <GnbPlusIcon width={24} height={24} fill={colors.primary001} />
@@ -140,25 +170,22 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    backgroundColor: 'rgba(0, 0, 0, 0.66)', // 반투명 배경
   },
   modalContent: {
-    flex: 1,
+    position: 'absolute',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    marginLeft: 260,
-    marginBottom: 20,
   },
   menuContainer: {
     width: 60,
     height: 340,
     backgroundColor: '#FFF',
     borderRadius: 28,
-    overflow: 'hidden',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingBottom:6,
-    bottom: -45,
+    paddingBottom: 6,
+    bottom: -40,
   },
   menuItem: {
     marginTop: 10,

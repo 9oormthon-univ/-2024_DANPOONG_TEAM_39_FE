@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import Feather from 'react-native-vector-icons/Feather';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import Feather from 'react-native-vector-icons/Feather'; // Feather 아이콘 사용
+import DateTimePicker from '@react-native-community/datetimepicker'; // 날짜 선택
 import moment from 'moment';
 import CalendarButton from '../atoms/CalendarButton';
 import colors from '../../styles/colors';
@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   dateText: {
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    textAlign: 'left',
-    lineHeight: 24,
-    color: colors.gray900,
+    fontSize: 16, // 텍스트 크기
+    fontFamily: fonts.semiBold, // Pretendard 폰트 설정
+    textAlign: 'left', // 왼쪽 정렬
+    lineHeight: 24, // 텍스트 줄 높이
+    color: colors.gray900, // 텍스트 색상
   },
   todayButton: {
     width: 65,
@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   todayButtonText: {
     color: '#FF7F00',
     fontFamily: fonts.semiBold,
-    fontWeight: '700',
-    lineHeight: 24,
+    fontWeight: '700', 
+    lineHeight: 24, // 피그마에서 지정된 Line Height
     fontSize: 14,
   },
 });

@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import colors from '../styles/colors';
 
+
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
     const timer = setTimeout(() => {

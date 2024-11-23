@@ -121,6 +121,7 @@ const OnboardingScreen = ({ navigation }) => {
           text="카카오 로그인"
         />
       </View>
+
     </View>
   );
 };
@@ -179,3 +180,4 @@ const styles = StyleSheet.create({
 });
 
 export default OnboardingScreen;
+
