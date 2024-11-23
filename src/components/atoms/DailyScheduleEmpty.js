@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import colors from '../../styles/colors';
 import textStyles from '../../styles/textStyles';
 import EmptyIcon from '../../assets/images/daily_empty.svg';
 import NextIcon from '../../assets/images/daily_empty_next.svg';
 
-const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400 }) => {
+const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400, onPress }) => {
   return (
     <View style={styles.container}>
       {/* 시작 시간과 점 */}
@@ -15,7 +15,7 @@ const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400 }) => {
       </View>
 
       {/* 박스 */}
-      <View style={styles.box}>
+      <TouchableOpacity style={styles.box} onPress={onPress}>
         {/* 아이콘과 시간 */}
         <View style={styles.textContainer}>
           <EmptyIcon width={24} height={24} style={styles.emptyIcon} />
@@ -27,7 +27,7 @@ const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400 }) => {
 
         {/* 오른쪽 아이콘 */}
         <NextIcon width={24} height={24} style={styles.nextIcon} />
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 12,
-    borderWidth: 1, // 스트로크 두께
-    borderColor: colors.primary001, // 스트로크 색상
+    borderWidth: 2, // 스트로크 두께 설정
+    borderColor: '#FFEAD6', // 스트로크 색상 설정
   },
   textContainer: {
     flexDirection: 'row',
