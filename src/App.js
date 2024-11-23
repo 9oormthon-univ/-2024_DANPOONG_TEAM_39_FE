@@ -6,6 +6,13 @@ import SplashScreen from './screens/SplashScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
+// 일정 추가 라이브러리
+import AddTasksHeader from './components/templates/AddTasksHeader'; // 커스텀 헤더
+import AddPillTask from './screens/AddPillTask'; 
+import AddMealTask from './screens/AddMealTask';
+import AddHospitalTask from './screens/AddHospitalTask'; 
+import AddRestTask from './screens/AddRestTask'; 
+import AddOthersTask from './screens/AddOthersTask'; 
 
 enableScreens(); // react-native-screens 초기화
 
@@ -15,10 +22,53 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
+        {/* 기존 화면 */}
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
+
+        {/* 일정 추가 화면 */}
+        <Stack.Screen 
+          name="AddPillTask" 
+          component={AddPillTask}
+          options={{
+            header: () => <AddTasksHeader />, 
+            presentation: 'modal',
+          }} 
+        />
+        <Stack.Screen 
+          name="AddMealTask" 
+          component={AddMealTask} 
+          options={{
+            header: () => <AddTasksHeader />, 
+            presentation: 'modal', 
+          }} 
+        />
+        <Stack.Screen 
+          name="AddHospitalTask" 
+          component={AddHospitalTask} 
+          options={{
+            header: () => <AddTasksHeader />, 
+            presentation: 'modal', 
+          }} 
+        />
+        <Stack.Screen 
+          name="AddRestTask" 
+          component={AddRestTask} 
+          options={{
+            header: () => <AddTasksHeader />,
+            presentation: 'modal', 
+          }} 
+        />
+        <Stack.Screen 
+          name="AddOthersTask" 
+          component={AddOthersTask} 
+          options={{
+            header: () => <AddTasksHeader />, 
+            presentation: 'modal', 
+          }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
