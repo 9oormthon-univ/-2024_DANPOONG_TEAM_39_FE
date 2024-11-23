@@ -16,11 +16,11 @@ import colors from '../../styles/colors';
 const DailySchedule = () => {
   const schedule = [
     { type: 'default', startTime: '09:00', endTime: '10:00', title: '아침 식사', location: '집', hasAlarm: true, hasRecommendation: false, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '11:00', endTime: '12:00', title: '노인정 가기', location: '노인정', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleBreak },
-    { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '13:00', endTime: '16:00', title: '데이케어센터 가기', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
-    { type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '20:00', endTime: '21:00', title: '잘 준비 하기', location: '집', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+    { type: 'default', startTime: '10:00', endTime: '12:00', title: '편의점 알바', location: 'GS25', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+    { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: 'GS25', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleMeal },
+    { type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleMeal },
+    { type: 'default', startTime: '19:00', endTime: '20:00', title: '수학 공부', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleEtc },
+    { type: 'default', startTime: '20:00', endTime: '21:00', title: '개발 공부', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleEtc },
     { type: 'pill', startTime: '16:00', endTime: '17:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task' },
   ];
 
@@ -59,15 +59,6 @@ const DailySchedule = () => {
           hasAlarm={item.hasAlarm}
           hasRecommendation={item.hasRecommendation}
           hasDolbomi={item.hasDolbomi}
-          color={item.color}
-        />
-      );
-    }
-    if (item.type === 'empty') {
-      return (
-        <DailyScheduleEmpty
-          time={item.startTime}
-          endTime={item.endTime}
           color={item.color}
         />
       );

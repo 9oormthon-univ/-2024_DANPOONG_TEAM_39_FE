@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
-import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
-import Popup from '../atoms/Popup'; // Popup 컴포넌트 가져오기
 
 const HOUR_HEIGHT = 60; // 1시간의 높이를 60px로 설정
 const DAYS_IN_WEEK = 7; // 일요일~토요일 기준
@@ -27,24 +25,12 @@ const calculateBlockHeight = (startTime, endTime) => {
 };
 
 const TimeBlockList = ({ tasks, weekDates }) => {
-  const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
-  const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
-
   const categoryColors = {
     '식사': colors.scheduleMeal,
     '병원': colors.scheduleHospital,
     '휴식': colors.scheduleBreak,
     '기타': colors.scheduleEtc,
     '내 일정': colors.gray400,
-  };
-
-  const handleOpenPopup = (startTime, endTime) => {
-    setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
-    setPopupVisible(true); // 팝업 열기
-  };
-
-  const handleClosePopup = () => {
-    setPopupVisible(false); // 팝업 닫기
   };
 
   return (
@@ -67,11 +53,12 @@ const TimeBlockList = ({ tasks, weekDates }) => {
 
       {/* 날짜별 Task 처리 */}
       {weekDates.map((weekDate) => {
+        // 같은 날짜의 Task를 필터링하고 시작 시간 순으로 정렬
         const tasksOnDate = tasks
           .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
           .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
 
-        return tasksOnDate.map((task, index) => {
+        return tasksOnDate.map((task) => {
           const top = timeToPosition(task.startTime);
           const height = calculateBlockHeight(task.startTime, task.endTime);
 
@@ -86,57 +73,6 @@ const TimeBlockList = ({ tasks, weekDates }) => {
           const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
           const backgroundColor = categoryColors[task.category];
-
-          // 공백 계산
-          if (index > 0) {
-            const previousTask = tasksOnDate[index - 1];
-            const prevEnd = timeToPosition(previousTask.endTime);
-            const currentStart = top;
-
-            if (currentStart > prevEnd) {
-              const gapHeight = currentStart - prevEnd;
-
-              return (
-                <React.Fragment key={`gap-${task.id}`}>
-                  {/* 공백 블록 */}
-                  <TouchableOpacity
-                    style={[
-                      styles.alertBlock,
-                      {
-                        top: prevEnd,
-                        height: gapHeight,
-                        left: `${leftPercentage}%`,
-                        width: `${widthPercentage}%`,
-                      },
-                    ]}
-                    onPress={() =>
-                      handleOpenPopup(previousTask.endTime, task.startTime)
-                    } // 팝업 열기
-                  >
-                    <View style={styles.alertIcon}>
-                      <Image source={AlertIcon} style={styles.alertIconImage} />
-                    </View>
-                  </TouchableOpacity>
-
-                  {/* 현재 Task */}
-                  <View
-                    style={[
-                      styles.block,
-                      {
-                        top,
-                        height,
-                        left: `${leftPercentage}%`,
-                        width: `${widthPercentage}%`,
-                        backgroundColor,
-                      },
-                    ]}
-                  >
-                    <Text style={styles.blockText}>{task.title}</Text>
-                  </View>
-                </React.Fragment>
-              );
-            }
-          }
 
           // Task 블록 렌더링
           return (
@@ -158,19 +94,6 @@ const TimeBlockList = ({ tasks, weekDates }) => {
           );
         });
       })}
-
-      {/* 팝업 컴포넌트 */}
-      <Modal
-        visible={popupVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={handleClosePopup}
-      >
-        <Popup
-          info={popupInfo}
-          onClose={handleClosePopup}
-        />
-      </Modal>
     </View>
   );
 };
@@ -211,25 +134,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     lineHeight: 14,
     fontSize: 12,
-  },
-  alertBlock: {
-    position: 'absolute',
-    backgroundColor: colors.primary003,
-    borderRadius: 8,
-    zIndex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  alertIcon: {
-    position: 'absolute',
-    top: -10,
-    alignSelf: 'center',
-    zIndex: 2,
-  },
-  alertIconImage: {
-    left: -3,
-    width: 50,
-    height: 50,
   },
 });
 
