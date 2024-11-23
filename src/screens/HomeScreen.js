@@ -6,6 +6,7 @@ import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
 import TimeBlockList from '../components/organisms/TimeBlockList';
+import DailySchedule from '../components/organisms/DailySchedule';
 import MockTasks from '../datas/MockTasks';
 import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
@@ -13,7 +14,7 @@ import moment from 'moment';
 import 'moment/locale/ko';
 import colors from '../styles/colors';
 
-moment.locale('ko'); // 애플리케이션 전역에서 한글로 설정
+moment.locale('ko');
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
@@ -24,7 +25,7 @@ const HomeScreen = () => {
     currentWeek.clone().add(i, 'days')
   );
 
-  // FamilyList 컴포넌트의 높이와 투명도 애니메이션 설정
+
   const familyListHeight = scrollY.interpolate({
     inputRange: [0, 100],
     outputRange: [100, 0],
@@ -44,7 +45,6 @@ const HomeScreen = () => {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
 
-      {/* 애니메이션이 적용된 FamilyList 컴포넌트 */}
       <Animated.View
         style={[
           styles.familyListContainer,
@@ -55,8 +55,13 @@ const HomeScreen = () => {
       </Animated.View>
 
       {/* CalendarDatepicker + Weekdays 컴포넌트 */}
+
       <View style={styles.datePickerContainer}>
-        <CalendarDatepicker currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
+        <CalendarDatepicker
+          currentWeek={currentWeek}
+          setCurrentWeek={setCurrentWeek}
+          onChangeView={handleViewChange}
+        />
         <WeekDays currentWeek={currentWeek} />
       </View>
 
@@ -68,7 +73,10 @@ const HomeScreen = () => {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
+        keyboardShouldPersistTaps="handled" // 키보드 관련 스크롤 이슈 해결
+        nestedScrollEnabled={true} // 자식 ScrollView가 스크롤 가능하게 함
       >
+
         {/* 위클리 컴포넌트 렌더링 */}
         <View style={styles.weeklyContent}>
           {/* 타임블록 렌더링 */}
@@ -81,6 +89,7 @@ const HomeScreen = () => {
       {/* 플로팅 카테고리 버튼 */}
       <FloatingButton />
     </SafeAreaView>
+
   );
 };
 
