@@ -22,37 +22,64 @@ const SegmentedControl = ({ segments, onSegmentPress, selectedSegments }) => {
   };
 
   return (
-    <View style={styles.container}>
-      {segments.map((segment, index) => (
-        <React.Fragment key={index}>
-          <TouchableOpacity
-            style={[
-              styles.segment,
-              selected.includes(segment.value) && styles.selectedSegment, // 선택된 세그먼트 강조
-              index === 0 && styles.leftRounded, // 왼쪽 끝 모서리 둥글게
-              index === segments.length - 1 && styles.rightRounded, // 오른쪽 끝 모서리 둥글게
-            ]}
-            onPress={() => handleSegmentPress(segment.value)}
-          >
-            <Text
-              style={[
-                styles.segmentText,
-                selected.includes(segment.value) && styles.selectedText, // 선택된 텍스트 강조
-              ]}
-            >
-              {segment.label}
-            </Text>
-          </TouchableOpacity>
+    <View style={styles.wrapper}>
+      {/* 라벨: * 이동 방식 */}
+      <View style={styles.labelContainer}>
+        <Text style={styles.required}>*</Text>
+        <Text style={styles.label}>이동 방식</Text>
+      </View>
 
-          {/* 세그먼트 구분선 추가 (마지막 세그먼트 제외) */}
-          {index < segments.length - 1 && <View style={styles.divider} />}
-        </React.Fragment>
-      ))}
+      {/* 세그먼트 컨트롤 */}
+      <View style={styles.container}>
+        {segments.map((segment, index) => (
+          <React.Fragment key={index}>
+            <TouchableOpacity
+              style={[
+                styles.segment,
+                selected.includes(segment.value) && styles.selectedSegment, // 선택된 세그먼트 강조
+                index === 0 && styles.leftRounded, // 왼쪽 끝 모서리 둥글게
+                index === segments.length - 1 && styles.rightRounded, // 오른쪽 끝 모서리 둥글게
+              ]}
+              onPress={() => handleSegmentPress(segment.value)}
+            >
+              <Text
+                style={[
+                  styles.segmentText,
+                  selected.includes(segment.value) && styles.selectedText, // 선택된 텍스트 강조
+                ]}
+              >
+                {segment.label}
+              </Text>
+            </TouchableOpacity>
+
+            {/* 세그먼트 구분선 추가 (마지막 세그먼트 제외) */}
+            {index < segments.length - 1 && <View style={styles.divider} />}
+          </React.Fragment>
+        ))}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+  },
+  labelContainer: {
+    flexDirection: 'row', // 라벨과 *를 한 줄로 배치
+    alignItems: 'center',
+    marginBottom: 16, // 라벨과 세그먼트 간 여백
+  },
+  required: {
+    color: colors.primary001, // *의 색상
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    marginRight: 4, // *와 "이동 방식" 사이 여백
+  },
+  label: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.gray800, // "이동 방식" 텍스트 색상
+  },
   container: {
     flexDirection: 'row',
     backgroundColor: '#fff',

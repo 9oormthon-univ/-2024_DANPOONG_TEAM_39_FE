@@ -3,6 +3,7 @@ import { LogBox } from 'react-native';
 // 특정 경고 메시지를 무시
 LogBox.ignoreLogs([
   'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
+  'Encountered two children with the same key', // 중복된 키에 대한 경고 무시
 ]);
 
 import React from 'react';
@@ -14,11 +15,13 @@ import colors from '../../styles/colors';
 
 const DailySchedule = () => {
   const schedule = [
-    { type: 'default', startTime: '09:00', endTime: '10:00', title: '아침 식사', location: '집', hasAlarm: true, hasRecommendation: false, hasDolbomi: true, color: colors.primary001 },
-    { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 회의', location: '회사', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.secondary001 },
-    { type: 'default', startTime: '24:00', endTime: '19:00', title: '저녁 약속', location: '레스토랑', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.gray400 },
-    { type: 'pill', startTime: '18:30', endTime: '21:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task2' },
-    { type: 'pill', startTime: '14:30', endTime: '21:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task1' },
+    { type: 'default', startTime: '09:00', endTime: '10:00', title: '아침 식사', location: '집', hasAlarm: true, hasRecommendation: false, hasDolbomi: true, color: colors.scheduleMeal },
+    { type: 'default', startTime: '11:00', endTime: '12:00', title: '노인정 가기', location: '노인정', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleBreak },
+    { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
+    { type: 'default', startTime: '13:00', endTime: '16:00', title: '데이케어센터 가기', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+    { type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
+    { type: 'default', startTime: '20:00', endTime: '21:00', title: '잘 준비 하기', location: '집', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+    { type: 'pill', startTime: '16:00', endTime: '17:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task' },
   ];
 
   const sortedSchedule = [...schedule].sort((a, b) => {

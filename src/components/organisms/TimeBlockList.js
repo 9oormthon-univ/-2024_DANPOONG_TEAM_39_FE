@@ -9,11 +9,13 @@ const DAYS_IN_WEEK = 7; // 일요일~토요일 기준
 const LEFT_PADDING = 7; // 왼쪽 패딩
 const RIGHT_PADDING = 2.5; // 오른쪽 패딩
 const GAP_BETWEEN_COLUMNS = 1; // 열 사이의 간격
+const START_HOUR = 9; // 시작 시간을 오전 9시로 설정
 
 // '10:30' -> 픽셀 단위로 변환
 const timeToPosition = (time) => {
   const [hour, minute] = time.split(':').map(Number);
-  return hour * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
+  const relativeHour = hour - START_HOUR; // 오전 9시 기준으로 상대 시간 계산
+  return relativeHour * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
 };
 
 // 블록 높이 계산 ('10:30' ~ '11:15')
@@ -34,17 +36,18 @@ const TimeBlockList = ({ tasks, weekDates }) => {
 
   return (
     <View style={styles.timelineContainer}>
-      {/* 시간 슬롯 표시 */}
-      {Array.from({ length: 24 }).map((_, index) => (
+      {/* 시간 슬롯 표시: 오전 9시부터 시작 */}
+      {Array.from({ length: 24 - START_HOUR }).map((_, index) => (
         <View
-          key={index}
+          key={index + START_HOUR}
           style={[
             styles.timeSlot,
             index === 0 && styles.firstTimeSlot,
           ]}
         >
           <Text style={styles.timeText}>
-            {index < 12 ? '오전\n' : '오후\n'} {index % 12 === 0 ? 12 : index % 12}시
+            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}{' '}
+            {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
           </Text>
         </View>
       ))}
@@ -99,7 +102,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
                     <View style={styles.alertIcon}>
                       <Image
                         source={AlertIcon}
-                       
+                        style={styles.alertIconImage}
                       />
                     </View>
                   </View>
@@ -190,16 +193,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary003,
     borderRadius: 8,
     zIndex: 1,
-    //padding: 5,
-    justifyContent: 'flex-start', // 내부 요소를 상단 정렬
-    alignItems: 'center', // 수평 중앙 정렬
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   alertIcon: {
     position: 'absolute',
-    top: -30, // 블록 위로 삐져나오도록 위치 조정
-    right: -6,
-    alignSelf: 'center', // 부모 블록의 중앙에 맞춤
-    zIndex: 2, // 블록 위로 표시되도록 설정
+    top: -10, // 아이콘 위치 조정
+    alignSelf: 'center',
+    zIndex: 2,
+  },
+  alertIconImage: {
+    left: -3,
+    width: 50,
+    height: 50,
   },
 });
 
