@@ -19,6 +19,8 @@ const DailySchedule = () => {
     { type: 'default', startTime: '10:00', endTime: '12:00', title: '편의점 알바', location: 'GS25', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
     { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: 'GS25', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleMeal },
     { type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleMeal },
+    { type: 'default', startTime: '19:00', endTime: '20:00', title: '수학 공부', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleEtc },
+    { type: 'default', startTime: '20:00', endTime: '21:00', title: '개발 공부', location: '집', hasAlarm: true, hasRecommendation: true, hasDolbomi: false, color: colors.scheduleEtc },
     { type: 'pill', startTime: '16:00', endTime: '17:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task' },
   ];
 
