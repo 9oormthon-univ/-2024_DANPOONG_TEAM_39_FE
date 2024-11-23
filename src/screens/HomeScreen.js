@@ -6,7 +6,7 @@ import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
 import TimeLine from '../components/atoms/TimeLine';
 import TimeBlockList from '../components/organisms/TimeBlockList';
-import Daily from '../components/organisms/Daily';
+import DailySchedule from '../components/organisms/DailySchedule';
 import MockTasks from '../datas/MockTasks';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
@@ -85,7 +85,7 @@ const HomeScreen = () => {
               <TimeBlockList tasks={MockTasks} />
             </>
           ) : (
-            <Daily />
+            <DailySchedule />
           )}
         </View>
       </ScrollView>
