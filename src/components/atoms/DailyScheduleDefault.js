@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     marginLeft: 8, // 텍스트로부터 오른쪽으로 8dp
   },
   box: {
-    width: '77%',
+    width: '80%',
     height: 81,
     borderRadius: 8,
     backgroundColor: colors.white000,
