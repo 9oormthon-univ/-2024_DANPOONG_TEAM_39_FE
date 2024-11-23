@@ -6,8 +6,11 @@ import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
 import TimeBlockList from '../components/organisms/TimeBlockList';
+import TimeBlockList2 from '../components/organisms/TimeBlockList2'; // 김구름 전용
 import DailySchedule from '../components/organisms/DailySchedule';
+import DailySchedule2 from '../components/organisms/DailySchedule2'; // 김구름 전용
 import MockTasks from '../datas/MockTasks';
+import MockTasks2 from '../datas/MockTasks2'; // 김구름 전용 데이터
 import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
@@ -22,6 +25,7 @@ const HomeScreen = () => {
   // 주 상태 관리
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
   const [viewMode, setViewMode] = useState('week'); // 'week' 또는 'day' 상태 관리
+  const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필
 
   const weekDates = Array.from({ length: 7 }, (_, i) =>
     currentWeek.clone().add(i, 'days')
@@ -43,16 +47,17 @@ const HomeScreen = () => {
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
 
+      {/* FamilyList 컴포넌트 */}
       <Animated.View
         style={[
           styles.familyListContainer,
           { height: familyListHeight, opacity: familyListOpacity },
         ]}
       >
-        <FamilyList Profiles={Profiles} />
+        <FamilyList Profiles={Profiles} onSelectProfile={setSelectedProfile} />
       </Animated.View>
 
-      {/* CalendarDatepicker + Weekdays 컴포넌트 */}
+      {/* CalendarDatepicker + WeekDays 컴포넌트 */}
       <View style={styles.datePickerContainer}>
         <CalendarDatepicker
           currentWeek={currentWeek}
@@ -74,13 +79,22 @@ const HomeScreen = () => {
         nestedScrollEnabled={true}
       >
         <View style={styles.content}>
+          {/* 선택된 프로필에 따라 다른 컴포넌트 렌더링 */}
           {viewMode === 'week' ? (
             <View style={styles.timeblockContainer}>
-              <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+              {selectedProfile?.name === '김구름' ? (
+                <TimeBlockList2 tasks={MockTasks2} weekDates={weekDates} />
+              ) : (
+                <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+              )}
             </View>
           ) : (
             <View style={styles.dailyContent}>
-              <DailySchedule tasks={MockTasks} selectedDate={moment()} />
+              {selectedProfile?.name === '김구름' ? (
+                <DailySchedule2 tasks={MockTasks2} selectedDate={moment()} />
+              ) : (
+                <DailySchedule tasks={MockTasks} selectedDate={moment()} />
+              )}
             </View>
           )}
         </View>
