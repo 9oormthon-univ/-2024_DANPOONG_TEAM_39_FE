@@ -30,78 +30,101 @@ const MedicationTypeButton = ({ onAddType, onDeleteType }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.typeList}>
-        {/* 추가 버튼 */}
-        {!isEditing && (
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setIsEditing(true)}
-          >
-            <Text style={styles.addButtonText}>복약 종류 추가</Text>
-            <Icon name="add" size={21} color={colors.black000} />
-          </TouchableOpacity>
-        )}
+    <View>
+      {/* 제목과 (required mark) */}
+      <View style={styles.header}>
+        <Text style={styles.requiredMark}>*</Text>
+        <Text style={styles.title}>복약 종류</Text>
+      </View>
 
-        {/* 텍스트 입력 */}
-        {isEditing && (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.inputLarge} // 스타일 이름 사용
-              placeholder="복약 종류 입력"
-              value={newType}
-              onChangeText={setNewType}
-              onSubmitEditing={handleAddType}
-              placeholderTextColor={colors.gray300}
-            />
-            <TouchableOpacity onPress={handleAddType}>
-              <Icon name="checkmark-circle" size={22} color={colors.primary001} />
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* 복약 종류 목록 */}
-        {medicationTypes.map((type, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.typeButton,
-              longPressedType === type && styles.deleteMode,
-            ]}
-            onPress={() => {
-              if (longPressedType === type) {
-                setLongPressedType(null);
-              }
-            }}
-            onLongPress={() => handleLongPress(type)}
-          >
-            <Text
-              style={[
-                styles.typeText,
-                longPressedType === type && styles.deleteText,
-              ]}
+      <View style={styles.container}>
+        <View style={styles.typeList}>
+          {/* 추가 버튼 */}
+          {!isEditing && (
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => setIsEditing(true)}
             >
-              {type}
-            </Text>
-            {longPressedType === type && (
-              <TouchableOpacity onPress={() => handleDeleteType(type)}>
-                <Icon
-  
-                  name="trash-outline"
-                  size={20}
-                  color={colors.primary001}
-                  style={{ marginLeft: 4}}
-                />
+              <Text style={styles.addButtonText}>복약 종류 추가</Text>
+              <Icon name="add" size={21} color={colors.black000} />
+            </TouchableOpacity>
+          )}
+
+          {/* 텍스트 입력 */}
+          {isEditing && (
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.inputLarge}
+                placeholder="복약 종류 입력"
+                value={newType}
+                onChangeText={setNewType}
+                onSubmitEditing={handleAddType}
+                placeholderTextColor={colors.gray300}
+              />
+              <TouchableOpacity onPress={handleAddType}>
+                <Icon name="checkmark-circle" size={22} color={colors.primary001} />
               </TouchableOpacity>
-            )}
-          </TouchableOpacity>
-        ))}
+            </View>
+          )}
+
+          {/* 복약 종류 목록 */}
+          {medicationTypes.map((type, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.typeButton,
+                longPressedType === type && styles.deleteMode,
+              ]}
+              onPress={() => {
+                if (longPressedType === type) {
+                  setLongPressedType(null);
+                }
+              }}
+              onLongPress={() => handleLongPress(type)}
+            >
+              <Text
+                style={[
+                  styles.typeText,
+                  longPressedType === type && styles.deleteText,
+                ]}
+              >
+                {type}
+              </Text>
+              {longPressedType === type && (
+                <TouchableOpacity onPress={() => handleDeleteType(type)}>
+                  <Icon
+                    name="trash-outline"
+                    size={20}
+                    color={colors.primary001}
+                    style={{ marginLeft: 4 }}
+                  />
+                </TouchableOpacity>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row', // 제목과 * 를 가로로 배치
+    alignItems: 'center',
+    marginBottom: 16, // 제목과 버튼 사이 간격
+  },
+  title: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.gray900,
+  },
+  requiredMark: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.primary001, // 강조 색상
+    marginLeft: 4, // 제목과 * 사이 간격
+  },
   container: {
     width: '100%',
     flexDirection: 'row',
@@ -137,14 +160,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: colors.gray050,
   },
-  inputSmall: {
-    //width: 100,
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    color: colors.gray900,
-  },
   inputLarge: {
-    //width: 200, // 이 부분을 조정하여 크기 변경
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.gray900,

@@ -13,14 +13,14 @@ const TaskAbledButton = ({ onPress, text }) => {
 
 const styles = StyleSheet.create({
   button: {
-    width: '90%', // 화면 너비의 90% 차지
+    width: '100%', // 화면 너비의 90% 차지
     height: 64,
     backgroundColor: colors.primary001, // colors.js에서 가져온 primary001
     borderRadius: 16,
     justifyContent: 'center', // 중앙 정렬
     alignItems: 'center', // 중앙 정렬
     alignSelf: 'center', // 부모 기준으로 수평 중앙 배치
-    marginVertical: 16, // 위아래 간격 추가
+    marginVertical: 45, // 위아래 간격 추가
   },
   text: {
     color: colors.white000, // 텍스트 색상 (흰색)

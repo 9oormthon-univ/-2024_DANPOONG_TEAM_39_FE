@@ -13,7 +13,7 @@ import AddMealTask from './screens/AddMealTask';
 import AddHospitalTask from './screens/AddHospitalTask'; 
 import AddRestTask from './screens/AddRestTask'; 
 import AddOthersTask from './screens/AddOthersTask'; 
-
+import AddMyCalendar from './screens/AddMyCalendar';
 enableScreens(); // react-native-screens 초기화
 
 const Stack = createStackNavigator();
@@ -64,6 +64,14 @@ export default function App() {
         <Stack.Screen 
           name="AddOthersTask" 
           component={AddOthersTask} 
+          options={{
+            header: () => <AddTasksHeader />, 
+            presentation: 'modal', 
+          }} 
+        />
+        <Stack.Screen 
+          name="AddMyCalendar" 
+          component={AddMyCalendar} 
           options={{
             header: () => <AddTasksHeader />, 
             presentation: 'modal', 

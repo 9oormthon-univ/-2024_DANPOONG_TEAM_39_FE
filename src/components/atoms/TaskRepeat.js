@@ -1,128 +1,124 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import RepeatIcon from '../../assets/images/repeat.svg'; // repeat.svg 아이콘
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import RepeatIcon from '../../assets/images/repeat.svg'; // 아이콘 import
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const TaskRepeat = ({ label = '반복 주기', options = ['매일 반복', '매주 반복', '매월 반복'] }) => {
+const TaskRepeat = ({ placeholder = '반복 주기', onSelectOption = () => {} }) => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(label);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const maxHeight = useRef(new Animated.Value(0)).current; // 초기 상태는 닫혀 있음
 
-  const handleOptionPress = (option) => {
+  const options = ['매일 반복', '매주 반복', '매월 반복'];
+
+  const toggleDropdown = () => {
+    Animated.timing(maxHeight, {
+      toValue: isDropdownVisible ? 0 : options.length * 50, // 드롭다운 상태에 따라 높이 설정
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => setDropdownVisible(!isDropdownVisible)); // 애니메이션 후 상태 변경
+  };
+
+  const handleSelectOption = (option) => {
     setSelectedOption(option);
-    setDropdownVisible(false);
+    toggleDropdown(); // 선택 후 드롭다운 닫기
+    onSelectOption(option); // 선택된 값을 부모로 전달
   };
 
   return (
-    <View style={styles.container}>
-      {/* Label */}
-      <Text style={styles.label}>일정 반복</Text>
-      {/* Dropdown Button */}
-      <TouchableOpacity
-        style={[
-          styles.dropdownButton,
-          isDropdownVisible && styles.dropdownButtonActive,
-        ]}
-        onPress={() => setDropdownVisible(!isDropdownVisible)}
-      >
-        <View style={styles.buttonContent}>
-          <Text
-            style={[
-              styles.selectedText,
-              selectedOption === label ? styles.labelText : styles.selectedOptionText,
-            ]}
-          >
-            {selectedOption}
-          </Text>
-          <RepeatIcon width={16} height={16} style={styles.icon} />
-        </View>
-      </TouchableOpacity>
-      {/* Dropdown Options */}
-      {isDropdownVisible && (
-        <View style={styles.dropdownOptions}>
-          {options.map((option, index) => (
+    <View>
+      {/* 제목 추가 */}
+      <Text style={styles.title}>일정 반복</Text>
+      <View style={styles.container}>
+        {/* 드롭다운 버튼 */}
+        <TouchableOpacity style={styles.picker} onPress={toggleDropdown}>
+          <View style={styles.buttonContent}>
+            <Text style={styles.selectedText}>
+              {selectedOption || placeholder}
+            </Text>
+            <RepeatIcon width={16} height={16} style={styles.icon} />
+          </View>
+        </TouchableOpacity>
+
+        {/* 드롭다운 목록 */}
+        <Animated.View style={[styles.dropdownContainer, { maxHeight }]}>
+          {options.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={[
-                styles.option,
-                index === options.length - 1 && styles.noBorder, // 마지막 옵션 구분선 제거
+                styles.dropdownItem,
+                item === selectedOption && styles.selectedItem, // 선택된 항목 강조
+                index === options.length - 1 && styles.lastItem, // 마지막 항목 처리
               ]}
-              onPress={() => handleOptionPress(option)}
+              onPress={() => handleSelectOption(item)}
             >
               <Text
                 style={[
-                  styles.optionText,
-                  option === selectedOption && styles.selectedOptionText, // 선택된 값 스타일 적용
+                  styles.dropdownText,
+                  item === selectedOption && styles.selectedText, // 선택된 텍스트 강조
                 ]}
               >
-                {option}
+                {item}
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
-      )}
+        </Animated.View>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  label: {
+  title: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.gray800,
-    marginBottom: 8,
+    marginBottom: 16, // 제목과 드롭다운 사이 여백
   },
-  dropdownButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16, // 좌우 간격
-    paddingVertical: 12,
+  container: {
+    alignSelf: 'flex-start', // 컨테이너를 콘텐츠 크기에 맞춤
     borderWidth: 1,
     borderColor: colors.gray200,
     borderRadius: 8,
-    backgroundColor: colors.white,
+    backgroundColor: colors.white000,
+    overflow: 'hidden', // 내부 요소가 박스를 벗어나지 않도록 설정
   },
-  dropdownButtonActive: {
-    borderBottomWidth: 0, // 하단 경계선 제거
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+  picker: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: colors.white000,
   },
   buttonContent: {
-    flexDirection: 'row',
-    //alignItems: 'c',
+    flexDirection: 'row', // 텍스트와 아이콘을 가로로 정렬
+    alignItems: 'center',
   },
   selectedText: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
-  },
-  labelText: {
-    color: colors.gray800, // 기본 텍스트 색상
-  },
-  selectedOptionText: {
-    color: colors.primary001, // 선택된 값의 텍스트 색상
+    color: colors.primary001, // 기본 텍스트 색상
   },
   icon: {
-    marginLeft: 4,
+    marginLeft: 4, // 텍스트와 아이콘 간격
   },
-  dropdownOptions: {
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    borderTopWidth: 0, // 상단 경계선 제거
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
-    backgroundColor: colors.white,
+  dropdownContainer: {
+    overflow: 'hidden',
+    borderTopWidth: 1, // 드롭다운 버튼과 목록 사이에 구분선 추가
+    borderTopColor: colors.gray200,
   },
-  option: {
-    paddingHorizontal: 16, // 좌우 간격 드롭다운 버튼과 동일하게 설정
+  dropdownItem: {
+    paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray200,
+    backgroundColor: colors.white000,
   },
-  noBorder: {
-    borderBottomWidth: 0, // 마지막 옵션 구분선 제거
+  lastItem: {
+    borderBottomWidth: 0, // 마지막 항목 보더 제거
   },
-  optionText: {
+  selectedItem: {
+    
+  },
+  dropdownText: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.gray900,

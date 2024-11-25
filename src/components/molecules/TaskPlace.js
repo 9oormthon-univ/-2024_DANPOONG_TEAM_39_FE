@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray200,
     borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: '#FFF', // 배경 흰색
   },
   field: {

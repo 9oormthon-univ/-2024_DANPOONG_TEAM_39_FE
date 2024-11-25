@@ -1,42 +1,129 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import CategoryPicker from '../components/atoms/CategoryPicker';
+import SegmentedControl from '../components/atoms/SegmentedControl';
+import CaregiverSelectionRow from '../components/molecules/CaregiverSelectionRow';
+import TaskNameInput from '../components/molecules/TaskNameInput';
+import TaskDatePickerButton from '../components/atoms/TaskDatePickerButton';
+import StartTimeEndTime from '../components/molecules/StartTimeEndTime';
+import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
+import TaskPlace from '../components/molecules/TaskPlace';
+import TaskMemo from '../components/molecules/TaskMemo';
+import TaskAbledButton from '../components/atoms/TaskAbledButton';
 import fonts from '../styles/fonts';
 import colors from '../styles/colors';
 
 const AddRestTask = ({ route }) => {
-    // route.params에서 selectedCategory 값을 가져와 초기값으로 설정
-    const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  
-    return (
-      <View style={styles.container}>
-        {/* 카테고리 선택 컴포넌트 */}
-        <View style={styles.pickerContainer}>
+  const navigation = useNavigation();
+  const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
+  const [selectedActivity, setSelectedActivity] = useState(null); // 선택된 활동 유형
+  const [name, setName] = useState(route.params?.familyName || '김구름');
+  const segments = [
+    { label: '운동', value: 'exercise' },
+    { label: '인지활동', value: 'cognitive' },
+    { label: '문화', value: 'culture' },
+    { label: '기타', value: 'others' },
+  ];
+
+  const handleSegmentPress = (value) => {
+    setSelectedActivity(value);
+  };
+
+  const handleRegister = () => {
+    // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
+    navigation.replace('HomeScreen');
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* 카테고리 선택 */}
+        <View style={styles.component}>
           <CategoryPicker
-            selectedCategory={selectedCategory} // 초기값 전달
-            onSelectCategory={(category) => setSelectedCategory(category)} // 선택된 값 업데이트
+            selectedCategory={selectedCategory}
+            onSelectCategory={(category) => setSelectedCategory(category)}
           />
         </View>
-      </View>
-    );
-  };
+
+        {/* 활동 유형 세그먼트 */}
+        <View style={styles.component}>
+          <SegmentedControl
+            segments={segments}
+            onSegmentPress={handleSegmentPress}
+            selectedSegments={selectedActivity}
+            label="휴식 카테고리"
+            isRequired={true}
+          />
+        </View>
+
+        {/* 돌보미 가족 선택 */}
+        <View style={styles.component}>
+          <CaregiverSelectionRow
+            label="돌보미 가족"
+            initialValue={name}
+            onValueChange={(value) => {}}
+          />
+        </View>
+
+        {/* 일정명 입력 */}
+        <View style={styles.component}>
+          <TaskNameInput />
+        </View>
+
+        {/* 일정 날짜 선택 */}
+        <View style={styles.component}>
+          <TaskDatePickerButton defaultText="일정 일자 선택" />
+        </View>
+
+        {/* 시작 시간 ~ 종료 시간 */}
+        <View style={styles.component}>
+          <StartTimeEndTime />
+        </View>
+
+        {/* 알림 설정 */}
+        <View style={styles.component}>
+          <TaskIsAlarmed />
+        </View>
+
+        {/* 장소 설정 */}
+        <View style={styles.component}>
+          <TaskPlace />
+        </View>
+
+        {/* 메모 */}
+        <View style={styles.component}>
+          <TaskMemo />
+        </View>
+
+        {/* 등록 버튼 */}
+        <View style={styles.component}>
+          <TaskAbledButton text="등록" onPress={handleRegister} />
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.gray050, // 배경색 화이트로 설정
+    backgroundColor: colors.gray050,
   },
-  pickerContainer: {
-    position: 'absolute', // 절대 위치 지정
-    top: '10%', // 화면 위에서부터 10% 위치에 배치
-    width: '90%', // 화면 너비의 90% 사용
-    maxWidth: 400, // 최대 너비 제한
-    marginHorizontal: '5%', // 좌우 여백을 동일하게 설정 (가운데 정렬)
-    zIndex: 10, // 다른 요소 위에 배치되도록 설정
+  scrollContainer: {
+    flex: 1,
   },
-
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+  },
+  component: {
+    marginBottom: 24, // 컴포넌트 간 간격
+  },
 });
 
 export default AddRestTask;
