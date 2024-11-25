@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const SegmentedControl = ({ segments, onSegmentPress, selectedSegments }) => {
+const SegmentedControl = ({ segments, onSegmentPress, selectedSegments, label, isRequired }) => {
   const [selected, setSelected] = useState(selectedSegments || []);
 
   const handleSegmentPress = (value) => {
@@ -23,11 +23,13 @@ const SegmentedControl = ({ segments, onSegmentPress, selectedSegments }) => {
 
   return (
     <View style={styles.wrapper}>
-      {/* 라벨: * 이동 방식 */}
-      <View style={styles.labelContainer}>
-        <Text style={styles.required}>*</Text>
-        <Text style={styles.label}>이동 방식</Text>
-      </View>
+      {/* 라벨과 (required) */}
+      {label && (
+        <View style={styles.labelContainer}>
+          {isRequired && <Text style={styles.required}>*</Text>}
+          <Text style={styles.label}>{label}</Text>
+        </View>
+      )}
 
       {/* 세그먼트 컨트롤 */}
       <View style={styles.container}>
@@ -62,8 +64,7 @@ const SegmentedControl = ({ segments, onSegmentPress, selectedSegments }) => {
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-  },
+  wrapper: {},
   labelContainer: {
     flexDirection: 'row', // 라벨과 *를 한 줄로 배치
     alignItems: 'center',
@@ -73,12 +74,12 @@ const styles = StyleSheet.create({
     color: colors.primary001, // *의 색상
     fontSize: 16,
     fontFamily: fonts.semiBold,
-    marginRight: 4, // *와 "이동 방식" 사이 여백
+    marginRight: 4, // *와 라벨 사이 여백
   },
   label: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
-    color: colors.gray800, // "이동 방식" 텍스트 색상
+    color: colors.gray800, // 라벨 텍스트 색상
   },
   container: {
     flexDirection: 'row',

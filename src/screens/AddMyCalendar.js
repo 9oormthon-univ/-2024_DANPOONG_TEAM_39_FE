@@ -14,22 +14,12 @@ import TaskMemo from '../components/molecules/TaskMemo';
 import SegmentedControl from '../components/atoms/SegmentedControl';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
 import TaskRepeat from '../components/atoms/TaskRepeat';
+import TypeButton from '../components/atoms/TypeButton';
 
-const AddHospitalTask = ({ route }) => {
+const AddMycalendar = ({ route }) => {
   const navigation = useNavigation(); // 네비게이션 객체 가져오기
   const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  const [selectedTime, setSelectedTime] = useState(null); // 선택된 식사 시간
   const [name, setName] = useState(route.params?.familyName || '김구름');
-  const segments = [
-    { label: '도보', value: 'walk' },
-    { label: '택시', value: 'taxi' },
-    { label: '대중교통', value: 'public' },
-    { label: '자동차', value: 'car' },
-  ];
-
-  const handleSegmentPress = (value) => {
-    setSelectedTime(value);
-  };
 
   const handleRegister = () => {
     // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
@@ -51,14 +41,10 @@ const AddHospitalTask = ({ route }) => {
           />
         </View>
         <View style={styles.component}>
-          <CaregiverSelectionRow
-            label="돌보미 가족"
-            initialValue={name}
-            onValueChange={(value) => {}}
-          />
+          <TaskNameInput />
         </View>
         <View style={styles.component}>
-          <TaskNameInput />
+            <TypeButton />
         </View>
         <View style={styles.component}>
           <TaskDatePickerButton defaultText="일정 일자 선택" />
@@ -71,15 +57,6 @@ const AddHospitalTask = ({ route }) => {
         </View>
         <View style={styles.component}>
           <TaskRepeat />
-        </View>
-        <View style={styles.component}>
-          <SegmentedControl
-            segments={segments}
-            onSegmentPress={handleSegmentPress}
-            selectedSegments={selectedTime}
-            label="이동 방식"
-            isRequired={true}
-          />
         </View>
         <View style={styles.component}>
           <TaskPlace />
@@ -112,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddHospitalTask;
+export default AddMycalendar;
