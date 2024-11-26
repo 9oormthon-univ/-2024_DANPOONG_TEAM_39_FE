@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet } from 'react-native';
-
+import HandHeartIcon from '../../assets/images/hand_heart.svg';
+import fonts from '../../styles/fonts';
 const FamilyList = ({ Profiles, onSelectProfile }) => {
   if (!Profiles || Profiles.length === 0) {
     return (
@@ -18,7 +19,11 @@ const FamilyList = ({ Profiles, onSelectProfile }) => {
         onPress={() => onSelectProfile(Profiles[0])} // 첫 번째 프로필 클릭
       >
         <Image source={Profiles[0].imagePath} style={styles.image} />
-        <Text style={styles.text}>{Profiles[0].name}</Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>{Profiles[0].name}</Text>
+          <HandHeartIcon style={styles.icon} />
+        </View>
+
       </TouchableOpacity>
 
       {/* 나머지 프로필들은 가로 스크롤 */}
@@ -56,6 +61,7 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     alignItems: 'center',
+    justifyContent: 'center', // 수직 가운데 정렬
     marginHorizontal: 10,
   },
   image: {
@@ -63,10 +69,21 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
   },
+  textContainer: {
+    flexDirection: 'row', // 텍스트와 아이콘을 가로로 배치
+    alignItems: 'center', // 수직 가운데 정렬
+  },
   text: {
     marginTop: 5,
+    fontFamily: fonts.semiBold,
+    textAlignVertical: 'center', // 텍스트의 수직 정렬
     fontSize: 14,
     color: '#FFF',
+  },
+  icon: {
+    
+    marginLeft: 2,
+    textAlignVertical: 'center', // 텍스트의 수직 정렬
   },
   emptyContainer: {
     flex: 1,
