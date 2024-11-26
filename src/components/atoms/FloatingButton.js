@@ -57,9 +57,8 @@ const FloatingButton = () => {
 
   // 내 일정 추가 네비게이션
   const handleMyCalendarNavigation = () => {
-    if (isMenuVisible) {
-      navigation.navigate('AddMyCalendar');
-    }
+    closeMenu();
+    navigation.navigate('AddMyCalendar');
   };
 
   return (
