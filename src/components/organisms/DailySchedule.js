@@ -12,17 +12,10 @@ import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
 import DailyScheduleEmpty from '../atoms/DailyScheduleEmpty';
 import DailySchedulePill from '../atoms/DailySchedulePill';
 import colors from '../../styles/colors';
+import MockTasks from '../../datas/MockTasks'; // Mock 데이터 가져오기
 
 const DailySchedule = () => {
-  const schedule = [
-    { type: 'default', startTime: '09:00', endTime: '10:00', title: '아침 식사', location: '집', hasAlarm: true, hasRecommendation: false, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '11:00', endTime: '12:00', title: '노인정 가기', location: '노인정', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleBreak },
-    { type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '13:00', endTime: '16:00', title: '데이케어센터 가기', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
-    { type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
-    { type: 'default', startTime: '20:00', endTime: '21:00', title: '잘 준비 하기', location: '집', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
-    { type: 'pill', startTime: '16:00', endTime: '17:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task' },
-  ];
+  const schedule = MockTasks; // Mock 데이터 사용
 
   const sortedSchedule = [...schedule].sort((a, b) => {
     const timeA = new Date(`1970-01-01T${a.startTime}:00Z`);

@@ -1,78 +1,22 @@
+import colors from '../styles/colors';
+
 const mockTasks = [
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-24', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-25', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-26', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-27', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-28', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-29', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '아침     식사', date: '2024-11-30', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-24', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-25', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-26', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-27', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-29', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '13', category: '식사', title: '점심     식사', date: '2024-11-30', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-24', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-25', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-27', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-28', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-29', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '14', category: '식사', title: '저녁     식사', date: '2024-11-30', startTime: '18:00', endTime: '19:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-29', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-25', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-26', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지     활동', date: '2024-11-27', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지     활동', date: '2024-11-28', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지     활동', date: '2024-11-30', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-24', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-25', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-26', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-27', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-28', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-29', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '노인정', date: '2024-11-30', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-
-  {id: '12', category: '기타', title: '데이   케어   센터', date: '2024-11-24', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '병원', date: '2024-11-25', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '데이   케어   센터', date: '2024-11-26', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '병원', date: '2024-11-27', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '데이   케어   센터', date: '2024-11-28', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '데이   케어   센터', date: '2024-11-29', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '기타', title: '데이   케어   센터', date: '2024-11-30', startTime: '13:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-29', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-25', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-26', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-27', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-28', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '12', category: '휴식', title: 'tv 시청', date: '2024-11-30', startTime: '16:00', endTime: '18:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-29', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-25', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '산책', date: '2024-11-26', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지       활동', date: '2024-11-27', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지       활동', date: '2024-11-28', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '휴식', title: '인지       활동', date: '2024-11-30', startTime: '19:00', endTime: '20:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-24', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-25', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-26', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-27', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-28', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-29', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-  {id: '12', category: '식사', title: '잘 준비하기', date: '2024-11-30', startTime: '20:00', endTime: '21:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기'},
-
-
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '09:00', endTime: '10:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '10:00', endTime: '11:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '11:00', endTime: '12:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '12:00', endTime: '13:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '13:00', endTime: '14:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '14:00', endTime: '15:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '15:00', endTime: '16:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-11-24', startTime: '16:00', endTime: '17:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  {id: '12', type: 'default', category: '식사', title: '아침 식사', date: '2024-12-01', startTime: '16:00', endTime: '17:00', isAllDay: false, repeat: 'daily', isAlarmOn: true, hasAlarm: true, hasRecommendation: false, hasDolbomi: true, location: '동네 공원', memo: '간단한 스트레칭과 달리기', color: colors.scheduleMeal},
+  //{ type: 'default', startTime: '09:00', endTime: '10:00', title: '아침 식사', location: '집', hasAlarm: true, hasRecommendation: false, hasDolbomi: true, color: colors.scheduleMeal },
+  //{ type: 'default', startTime: '11:00', endTime: '12:00', title: '노인정 가기', location: '노인정', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleBreak },
+  //{ type: 'default', startTime: '12:00', endTime: '13:00', title: '점심 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
+  //{ type: 'default', startTime: '13:00', endTime: '16:00', title: '데이케어센터 가기', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+  //{ type: 'default', startTime: '18:00', endTime: '19:00', title: '저녁 식사', location: '데이케어센터', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleMeal },
+  //{ type: 'default', startTime: '20:00', endTime: '21:00', title: '잘 준비 하기', location: '집', hasAlarm: false, hasRecommendation: true, hasDolbomi: true, color: colors.scheduleEtc },
+  //{ type: 'pill', startTime: '16:00', endTime: '17:00', title: '저녁 약 복용', hasAlarm: true, isChecked: false, color: colors.secondary002, id: 'task' },
 ];
 
 export default mockTasks;
