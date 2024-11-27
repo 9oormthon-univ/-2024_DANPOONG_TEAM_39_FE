@@ -97,9 +97,9 @@ const DailySchedule = ({ selectedDate }) => {
         time={item.startTime}
         title={item.title}
         location={item.location}
-        hasAlarm={item.isAlarmOn}
-        hasRecommendation={false} // 필요 시 데이터 추가
-        hasDolbomi={false} // 필요 시 데이터 추가
+        hasAlarm={item.hasAlarm} // MockTasks에서 가져온 값 적용
+        hasRecommendation={item.hasRecommendation} // MockTasks에서 가져온 값 적용
+        hasDolbomi={item.hasDolbomi} // MockTasks에서 가져온 값 적용
         color={color}
       />
     );
