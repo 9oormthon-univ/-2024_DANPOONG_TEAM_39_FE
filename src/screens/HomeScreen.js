@@ -26,6 +26,7 @@ const HomeScreen = () => {
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
   const [viewMode, setViewMode] = useState('week'); // 'week' 또는 'day' 상태 관리
   const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // WeekDays에서 선택된 날짜
 
   const weekDates = Array.from({ length: 7 }, (_, i) =>
     currentWeek.clone().add(i, 'days')
@@ -64,7 +65,10 @@ const HomeScreen = () => {
           setCurrentWeek={setCurrentWeek}
           onChangeView={(newView) => setViewMode(newView === '주' ? 'week' : 'day')}
         />
-        <WeekDays currentWeek={currentWeek} />
+        <WeekDays
+          currentWeek={currentWeek}
+          onDateSelect={(date) => setSelectedDate(date)} // 선택된 날짜를 업데이트
+        />
       </View>
 
       {/* 일정 렌더링 */}
@@ -91,9 +95,9 @@ const HomeScreen = () => {
           ) : (
             <View style={styles.dailyContent}>
               {selectedProfile?.name === '김구름' ? (
-                <DailySchedule2 tasks={MockTasks2} selectedDate={moment()} />
+                <DailySchedule2 tasks={MockTasks2} selectedDate={selectedDate} />
               ) : (
-                <DailySchedule tasks={MockTasks} selectedDate={moment()} />
+                <DailySchedule tasks={MockTasks} selectedDate={selectedDate} /> // 선택된 날짜 전달
               )}
             </View>
           )}

@@ -33,6 +33,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
   const categoryColors = {
     '식사': colors.scheduleMeal,
     '병원': colors.scheduleHospital,
+    '복약': colors.scheduleMeal,
     '휴식': colors.scheduleBreak,
     '기타': colors.scheduleEtc,
     '내 일정': colors.gray400,

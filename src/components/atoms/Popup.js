@@ -29,15 +29,15 @@ const Popup = ({ visible, onClose }) => {
           {/* 중앙 섹션 */}
           <View style={styles.contentSection}>
             <View style={styles.textContainer}>
-              <Text style={styles.centerTitle}>송파행복데이케어센터</Text>
+              <Text style={styles.centerTitle}>굿데이케어센터</Text>
               <Text style={styles.detailText}>자세히 보기</Text>
               <View style={styles.locationContainer}>
                 <LocationIcon width={16} height={16} />
-                <Text style={styles.locationText}>자택으로부터 000m</Text>
+                <Text style={styles.locationText}>여기로부터 5.2km</Text>
               </View>
             </View>
             <Image
-              source={require('../../assets/images/img_onboarding.png')}
+              source={require('../../assets/images/img_popup.png')}
               style={styles.image}
               resizeMode="cover"
             />
