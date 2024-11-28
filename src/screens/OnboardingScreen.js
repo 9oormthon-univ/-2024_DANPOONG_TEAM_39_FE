@@ -1,17 +1,15 @@
 import React, { useState, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  Animated,
-  Image,
-} from 'react-native';
+import { View, Text, StyleSheet, Dimensions, FlatList, Animated, Image } from 'react-native';
+import { WebView } from 'react-native-webview'; // WebView 추가
+import { SafeAreaView } from 'react-native-safe-area-context'; // SafeAreaView 추가
 import KakaologinButton from '../components/atoms/KakaologinButton';
 import colors from '../styles/colors';
 import textStyles from '../styles/textStyles';
+import 'react-native-url-polyfill/auto'; // URLSearchParams 폴리필 추가
+import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } from '@env';
 
+const CLIENT_ID = KAKAO_CLIENT_ID;
+const REDIRECT_URI = KAKAO_REDIRECT_URI;
 const { width: screenWidth } = Dimensions.get('window');
 
 // Onboarding 데이터
@@ -36,9 +34,28 @@ const slides = [
 
 const OnboardingScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showWebView, setShowWebView] = useState(false); // WebView 표시 상태 관리
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  // 인디케이터 컴포넌트
+  // 카카오 로그인 URL 생성
+  const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+
+  // WebView에서 네비게이션 상태 변화 처리
+  const handleNavigationStateChange = (navState) => {
+    if (navState.url.startsWith(REDIRECT_URI)) {
+      // Redirect URI 처리 (카카오 서버가 리다이렉트한 URL)
+      const params = new URL(navState.url).searchParams;
+      const code = params.get('code'); // Authorization Code 추출
+
+      if (code) {
+        setShowWebView(false); // WebView 닫기
+
+        // 홈 화면으로 이동하며 Authorization Code 전달
+        navigation.replace('HomeScreen', { code });
+      }
+    }
+  };
+
   const Indicator = () => {
     return (
       <View style={styles.paginationContainer}>
@@ -75,54 +92,59 @@ const OnboardingScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <FlatList
-          data={slides}
-          keyExtractor={(_, index) => index.toString()}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: false }
-          )}
-          onMomentumScrollEnd={(e) => {
-            const newIndex = Math.round(
-              e.nativeEvent.contentOffset.x / screenWidth
-            );
-            setCurrentIndex(newIndex);
-          }}
-          renderItem={({ item, index }) => (
-            <View style={styles.slide}>
-              {/* 텍스트 */}
-              <Text
-                style={[
-                  styles.text,
-                  index === 3 && styles.textLeft, // 4번째 페이지는 왼쪽 정렬
-                ]}
-              >
-                {item.text}
-              </Text>
-              {/* 이미지 */}
-              <Image source={item.image} style={styles.image} />
-            </View>
-          )}
+    <SafeAreaView style={styles.container}>
+      {showWebView ? (
+        <WebView
+          source={{ uri: KAKAO_AUTH_URL }} // 카카오 로그인 페이지 URL
+          onNavigationStateChange={handleNavigationStateChange}
+          style={{ flex: 1 }}
         />
+      ) : (
+        <>
+          <View style={styles.content}>
+            <FlatList
+              data={slides}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                { useNativeDriver: false }
+              )}
+              onMomentumScrollEnd={(e) => {
+                const newIndex = Math.round(
+                  e.nativeEvent.contentOffset.x / screenWidth
+                );
+                setCurrentIndex(newIndex);
+              }}
+              renderItem={({ item, index }) => (
+                <View style={styles.slide}>
+                  <Text
+                    style={[
+                      styles.text,
+                      index === 3 && styles.textLeft,
+                    ]}
+                  >
+                    {item.text}
+                  </Text>
+                  <Image source={item.image} style={styles.image} />
+                </View>
+              )}
+            />
+            <Indicator />
+          </View>
 
-        {/* 인디케이터 */}
-        <Indicator />
-      </View>
-
-      {/* 로그인 버튼 */}
-      <View style={styles.loginButtonContainer}>
-        <KakaologinButton
-          onPress={() => navigation.replace('HomeScreen')}
-          text="카카오 로그인"
-        />
-      </View>
-
-    </View>
+          {/* 로그인 버튼 */}
+          <View style={styles.loginButtonContainer}>
+            <KakaologinButton
+              onPress={() => setShowWebView(true)} // WebView 표시
+              text="카카오 로그인"
+            />
+          </View>
+        </>
+      )}
+    </SafeAreaView>
   );
 };
 
@@ -143,15 +165,15 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    fontFamily: textStyles.title18SemiBold.fontFamily, // 올바른 폰트 속성
+    fontFamily: textStyles.title18SemiBold.fontFamily,
     color: colors.gray900,
     marginBottom: 10,
-    textAlign: 'center', // 기본 중앙 정렬
+    textAlign: 'center',
   },
   textLeft: {
-    textAlign: 'left', // 4번째 페이지는 왼쪽 정렬
-    fontFamily: textStyles.title18SemiBold.fontFamily, // 올바른 폰트 속성
-    width: screenWidth * 0.8, // 너비 조정
+    textAlign: 'left',
+    fontFamily: textStyles.title18SemiBold.fontFamily,
+    width: screenWidth * 0.8,
   },
   image: {
     width: screenWidth * 0.8,
@@ -180,4 +202,3 @@ const styles = StyleSheet.create({
 });
 
 export default OnboardingScreen;
-

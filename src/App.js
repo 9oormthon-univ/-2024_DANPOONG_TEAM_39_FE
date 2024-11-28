@@ -6,7 +6,7 @@ import SplashScreen from './screens/SplashScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
-// 일정 추가 라이브러리
+
 import AddTasksHeader from './components/templates/AddTasksHeader'; // 커스텀 헤더
 import AddPillTask from './screens/AddPillTask'; 
 import AddMealTask from './screens/AddMealTask';
