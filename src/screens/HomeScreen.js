@@ -1,30 +1,37 @@
 import React, { useState, useRef } from 'react';
-import { View, Animated, ScrollView, StyleSheet, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context'; // SafeAreaView 임포트
+import { View, Animated, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/templates/Header';
 import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
 import TimeBlockList from '../components/organisms/TimeBlockList';
+import TimeBlockList2 from '../components/organisms/TimeBlockList2'; // 김구름 전용
+import DailySchedule from '../components/organisms/DailySchedule';
+import DailySchedule2 from '../components/organisms/DailySchedule2'; // 김구름 전용
 import MockTasks from '../datas/MockTasks';
+import MockTasks2 from '../datas/MockTasks2'; // 김구름 전용 데이터
 import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
 import colors from '../styles/colors';
 
-moment.locale('ko'); // 애플리케이션 전역에서 한글로 설정
+moment.locale('ko');
 
 const HomeScreen = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
 
   // 주 상태 관리
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
+  const [viewMode, setViewMode] = useState('week'); // 'week' 또는 'day' 상태 관리
+  const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필
+  const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // WeekDays에서 선택된 날짜
+
   const weekDates = Array.from({ length: 7 }, (_, i) =>
     currentWeek.clone().add(i, 'days')
   );
 
-  // FamilyList 컴포넌트의 높이와 투명도 애니메이션 설정
   const familyListHeight = scrollY.interpolate({
     inputRange: [0, 100],
     outputRange: [100, 0],
@@ -37,27 +44,31 @@ const HomeScreen = () => {
     extrapolate: 'clamp',
   });
 
-  // 타임라인 시간 배열
-  const hours = Array.from({ length: 24 }, (_, index) => index); // 0 ~ 23 생성
-
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
       <Header />
 
-      {/* 애니메이션이 적용된 FamilyList 컴포넌트 */}
+      {/* FamilyList 컴포넌트 */}
       <Animated.View
         style={[
           styles.familyListContainer,
           { height: familyListHeight, opacity: familyListOpacity },
         ]}
       >
-        <FamilyList Profiles={Profiles} />
+        <FamilyList Profiles={Profiles} onSelectProfile={setSelectedProfile} />
       </Animated.View>
 
-      {/* CalendarDatepicker + Weekdays 컴포넌트 */}
+      {/* CalendarDatepicker + WeekDays 컴포넌트 */}
       <View style={styles.datePickerContainer}>
-        <CalendarDatepicker currentWeek={currentWeek} setCurrentWeek={setCurrentWeek} />
-        <WeekDays currentWeek={currentWeek} />
+        <CalendarDatepicker
+          currentWeek={currentWeek}
+          setCurrentWeek={setCurrentWeek}
+          onChangeView={(newView) => setViewMode(newView === '주' ? 'week' : 'day')}
+        />
+        <WeekDays
+          currentWeek={currentWeek}
+          onDateSelect={(date) => setSelectedDate(date)} // 선택된 날짜를 업데이트
+        />
       </View>
 
       {/* 일정 렌더링 */}
@@ -68,17 +79,31 @@ const HomeScreen = () => {
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: false }
         )}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
       >
-        {/* 위클리 컴포넌트 렌더링 */}
-        <View style={styles.weeklyContent}>
-          {/* 타임블록 렌더링 */}
-          <View style={styles.timeblockContainer}>
-            <TimeBlockList tasks={MockTasks} weekDates={weekDates}/>
-          </View>
+        <View style={styles.content}>
+          {/* 선택된 프로필에 따라 다른 컴포넌트 렌더링 */}
+          {viewMode === 'week' ? (
+            <View style={styles.timeblockContainer}>
+              {selectedProfile?.name === '김구름' ? (
+                <TimeBlockList2 tasks={MockTasks2} weekDates={weekDates} />
+              ) : (
+                <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+              )}
+            </View>
+          ) : (
+            <View style={styles.dailyContent}>
+              {selectedProfile?.name === '김구름' ? (
+                <DailySchedule2 tasks={MockTasks2} selectedDate={selectedDate} />
+              ) : (
+                <DailySchedule tasks={MockTasks} selectedDate={selectedDate} /> // 선택된 날짜 전달
+              )}
+            </View>
+          )}
         </View>
       </ScrollView>
 
-      {/* 플로팅 카테고리 버튼 */}
       <FloatingButton />
     </SafeAreaView>
   );
@@ -105,10 +130,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray050,
   },
   scrollContent: {
-    paddingBottom: 80, // 하단 여유 공간 추가
+    paddingBottom: 80,
     zIndex: 1,
   },
-  weeklyContent: {
+  content: {
     paddingLeft: 10,
   },
 });

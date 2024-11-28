@@ -1,19 +1,27 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import HeaderBell from '../../assets/images/header_bell.svg';
+import HeaderMenu from '../../assets/images/header_menu.svg';
 
 const Header = () => {
   return (
     <View style={styles.header}>
+      {/* 텍스트 아이콘 */}
+      <Image
+        source={require('../../assets/images/icon_songil_text.png')}
+        style={styles.textIcon}
+      />
+
+      {/* 오른쪽 아이콘 컨테이너 */}
       <View style={styles.iconContainer}>
         {/* 알림 아이콘 */}
         <TouchableOpacity style={styles.icon}>
-          <Image source={require('../../assets/images/bell.png')} />
+          <HeaderBell />
         </TouchableOpacity>
 
         {/* 메뉴 아이콘 */}
         <TouchableOpacity style={styles.icon}>
-          <Image source={require('../../assets/images/menu.png')} />
+          <HeaderMenu />
         </TouchableOpacity>
       </View>
     </View>
@@ -23,18 +31,26 @@ const Header = () => {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    paddingHorizontal: 10,  // 좌우 여백을 20px로 설정
-    paddingVertical: 16,    // 상하 여백을 16px로 설정
-    backgroundColor: '#FF7F00', // 배경색 추가 (아이콘이 하얀색이라 배경색이 필요)
-    alignItems: 'center',   // 자식 요소를 수직 가운데 정렬
-    justifyContent: 'flex-end', // 아이콘들이 오른쪽 끝으로 정렬되도록 설정
+    paddingHorizontal: 10,
+    paddingVertical: 16,
+    backgroundColor: '#FF7F00',
+    alignItems: 'center',
+    justifyContent: 'space-between', // 아이콘 간격 균등 배치
+  },
+  textIcon: {
+    position: 'absolute',
+    left: 0, // 왼쪽에서 16dp
+    width: 100, // 아이콘 너비
+    height: 24, // 아이콘 높이
+    resizeMode: 'contain', // 아이콘 비율 유지
   },
   iconContainer: {
-    flexDirection: 'row',   // 아이콘을 가로로 나열
-    alignItems: 'center',   // 아이콘을 수직 가운데 정렬
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto', // 오른쪽으로 밀기
   },
   icon: {
-    marginRight: 8,         // 아이콘 간 간격을 8px로 설정
+    marginRight: 8,
   },
 });
 
