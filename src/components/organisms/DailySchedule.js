@@ -1,3 +1,10 @@
+import { LogBox } from 'react-native';
+
+// 특정 경고 메시지 무시
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
+]);
+
 import React from 'react';
 import { StyleSheet, FlatList, View } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
