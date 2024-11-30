@@ -5,14 +5,12 @@ import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 import CalendarDateIcon from '../../assets/images/calendar_date.svg';
 
-const TaskDatePickerButton = ({ defaultText = '일정 일자 선택', onDateChange }) => {
+const TaskDatePickerButton = ({ defaultText = '일정 일자 선택', selectedDate, onDateChange }) => {
   const [isPickerVisible, setPickerVisible] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(defaultText);
 
   const handleConfirm = (event, date) => {
     if (date) {
       const formattedDate = date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' });
-      setSelectedDate(formattedDate);
       onDateChange?.(formattedDate);
     }
     setPickerVisible(false);
@@ -26,8 +24,8 @@ const TaskDatePickerButton = ({ defaultText = '일정 일자 선택', onDateChan
       </View>
 
       <TouchableOpacity style={styles.button} onPress={() => setPickerVisible(true)}>
-        <Text style={[styles.text, { color: selectedDate === defaultText ? colors.gray400 : colors.gray800 }]}>
-          {selectedDate}
+        <Text style={[styles.text, { color: selectedDate ? colors.gray800 : colors.gray400 }]}>
+          {selectedDate || defaultText}
         </Text>
         <CalendarDateIcon />
       </TouchableOpacity>

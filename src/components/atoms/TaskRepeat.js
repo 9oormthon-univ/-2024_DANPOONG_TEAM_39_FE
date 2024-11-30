@@ -4,16 +4,17 @@ import RepeatIcon from '../../assets/images/repeat.svg'; // 아이콘 import
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const TaskRepeat = ({ placeholder = '반복 주기', onSelectOption = () => {} }) => {
+const TaskRepeat = ({ placeholder = '반복 주기', repeatCycle, onSelectOption }) => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(repeatCycle || null);
   const maxHeight = useRef(new Animated.Value(0)).current; // 초기 상태는 닫혀 있음
 
-  const options = ['매일 반복', '매주 반복', '매월 반복'];
+  // 동일한 옵션값을 자식 내부에서 관리
+  const repeatOptions = ['매일 반복', '매주 반복', '매월 반복'];
 
   const toggleDropdown = () => {
     Animated.timing(maxHeight, {
-      toValue: isDropdownVisible ? 0 : options.length * 50, // 드롭다운 상태에 따라 높이 설정
+      toValue: isDropdownVisible ? 0 : repeatOptions.length * 50, // 드롭다운 상태에 따라 높이 설정
       duration: 300,
       useNativeDriver: false,
     }).start(() => setDropdownVisible(!isDropdownVisible)); // 애니메이션 후 상태 변경
@@ -22,7 +23,7 @@ const TaskRepeat = ({ placeholder = '반복 주기', onSelectOption = () => {} }
   const handleSelectOption = (option) => {
     setSelectedOption(option);
     toggleDropdown(); // 선택 후 드롭다운 닫기
-    onSelectOption(option); // 선택된 값을 부모로 전달
+    onSelectOption?.(option); // 선택된 값을 부모로 전달
   };
 
   return (
@@ -42,13 +43,13 @@ const TaskRepeat = ({ placeholder = '반복 주기', onSelectOption = () => {} }
 
         {/* 드롭다운 목록 */}
         <Animated.View style={[styles.dropdownContainer, { maxHeight }]}>
-          {options.map((item, index) => (
+          {repeatOptions.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={[
                 styles.dropdownItem,
                 item === selectedOption && styles.selectedItem, // 선택된 항목 강조
-                index === options.length - 1 && styles.lastItem, // 마지막 항목 처리
+                index === repeatOptions.length - 1 && styles.lastItem, // 마지막 항목 처리
               ]}
               onPress={() => handleSelectOption(item)}
             >
@@ -73,15 +74,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.semiBold,
     color: colors.gray800,
-    marginBottom: 16, // 제목과 드롭다운 사이 여백
+    marginBottom: 16,
   },
   container: {
-    alignSelf: 'flex-start', // 컨테이너를 콘텐츠 크기에 맞춤
+    alignSelf: 'flex-start',
     borderWidth: 1,
     borderColor: colors.gray200,
     borderRadius: 8,
     backgroundColor: colors.white000,
-    overflow: 'hidden', // 내부 요소가 박스를 벗어나지 않도록 설정
+    overflow: 'hidden',
   },
   picker: {
     paddingVertical: 12,
@@ -89,20 +90,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white000,
   },
   buttonContent: {
-    flexDirection: 'row', // 텍스트와 아이콘을 가로로 정렬
+    flexDirection: 'row',
     alignItems: 'center',
   },
   selectedText: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
-    color: colors.primary001, // 기본 텍스트 색상
+    color: colors.primary001,
   },
   icon: {
-    marginLeft: 4, // 텍스트와 아이콘 간격
+    marginLeft: 4,
   },
   dropdownContainer: {
     overflow: 'hidden',
-    borderTopWidth: 1, // 드롭다운 버튼과 목록 사이에 구분선 추가
+    borderTopWidth: 1,
     borderTopColor: colors.gray200,
   },
   dropdownItem: {
@@ -113,10 +114,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white000,
   },
   lastItem: {
-    borderBottomWidth: 0, // 마지막 항목 보더 제거
+    borderBottomWidth: 0,
   },
   selectedItem: {
-    
+    backgroundColor: colors.primary005,
   },
   dropdownText: {
     fontSize: 16,

@@ -4,9 +4,7 @@ import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 import PencilLineIcon from '../../assets/images/pencil_line.svg'; // 기본 아이콘
 
-const TaskMemo = ({ label = '메모', placeholder = '메모 추가하기' }) => {
-  const [memo, setMemo] = useState(''); // 메모 상태
-
+const TaskMemo = ({ label = '메모', placeholder = '메모 추가하기', memo, onValueChange }) => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -20,14 +18,15 @@ const TaskMemo = ({ label = '메모', placeholder = '메모 추가하기' }) => 
           style={styles.field}
           placeholder={placeholder}
           placeholderTextColor={colors.gray400}
-          value={memo} // 텍스트 필드 값
-          onChangeText={setMemo} // 값 변경 핸들러
+          value={memo} // 부모 상태에서 관리된 값
+          onChangeText={onValueChange} // 값 변경 시 부모에 전달
         />
         <PencilLineIcon width={20} height={20} />
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
