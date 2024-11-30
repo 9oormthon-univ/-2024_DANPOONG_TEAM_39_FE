@@ -13,18 +13,35 @@ import TaskMemo from '../components/molecules/TaskMemo';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
 import fonts from '../styles/fonts';
 import colors from '../styles/colors';
+import { LogBox } from 'react-native';
+
+// 특정 경고 메시지를 무시
+LogBox.ignoreLogs([
+  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
+]);
 
 const AddRestTask = ({ route }) => {
   const navigation = useNavigation();
   const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
   const [selectedActivity, setSelectedActivity] = useState(null); // 선택된 활동 유형
   const [name, setName] = useState(route.params?.familyName || '김구름');
-  const segments = [
-    { label: '운동', value: 'exercise' },
-    { label: '인지활동', value: 'cognitive' },
-    { label: '문화', value: 'culture' },
-    { label: '기타', value: 'others' },
-  ];
+  
+  // 카테고리별 페이지 맵핑
+  const categoryRoutes = {
+    hospital: 'AddHospitalTask',
+    medication: 'AddPillTask',
+    others: 'AddOthersTask',
+    rest: 'AddRestTask',
+  };
+
+  // 카테고리 선택 처리
+  const handleCategorySelect = (category) => {
+    if (selectedCategory === category) return; // 이미 선택된 카테고리라면 이동하지 않음
+    setSelectedCategory(category);
+
+    const route = categoryRoutes[category] || 'AddMealTask'; // 기본 경로 설정
+    navigation.navigate(route); // 카테고리별 페이지로 이동
+  };
 
   const handleSegmentPress = (value) => {
     setSelectedActivity(value);
@@ -34,6 +51,13 @@ const AddRestTask = ({ route }) => {
     // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
     navigation.replace('HomeScreen');
   };
+
+  const segments = [
+    { label: '운동', value: 'exercise' },
+    { label: '인지활동', value: 'cognitive' },
+    { label: '문화', value: 'culture' },
+    { label: '기타', value: 'others' },
+  ];
 
   return (
     <View style={styles.container}>
@@ -46,7 +70,7 @@ const AddRestTask = ({ route }) => {
         <View style={styles.component}>
           <CategoryPicker
             selectedCategory={selectedCategory}
-            onSelectCategory={(category) => setSelectedCategory(category)}
+            onSelectCategory={handleCategorySelect}
           />
         </View>
 

@@ -6,7 +6,6 @@ import fonts from '../../styles/fonts';
 
 const CategoryPicker = ({ selectedCategory, onSelectCategory }) => {
   const [isDropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownHeight = useRef(new Animated.Value(50)).current; // 초기 높이는 선택된 항목만 보이도록 설정
 
   const categories = [
     { label: '식사', value: 'meal' },
@@ -17,31 +16,16 @@ const CategoryPicker = ({ selectedCategory, onSelectCategory }) => {
   ];
 
   const toggleDropdown = () => {
-    if (isDropdownVisible) {
-      // 닫힐 때 애니메이션
-      Animated.timing(dropdownHeight, {
-        toValue: 50, // 닫힌 상태에서는 선택된 항목만 보임
-        duration: 300,
-        useNativeDriver: false,
-      }).start(() => setDropdownVisible(false));
-    } else {
-      // 열릴 때 애니메이션
-      setDropdownVisible(true);
-      Animated.timing(dropdownHeight, {
-        toValue: categories.length * 50, // 전체 목록이 보이도록 높이 설정
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    }
+    setDropdownVisible((prev) => !prev);
   };
 
   const handleSelectCategory = (category) => {
     onSelectCategory(category); // 선택된 값을 부모로 전달
-    toggleDropdown(); // 선택 후 드롭다운 닫기
+    setDropdownVisible(false); // 드롭다운 닫기
   };
 
   return (
-    <Animated.View style={[styles.container, { height: dropdownHeight }]}>
+    <View style={[styles.container, isDropdownVisible ? { maxHeight: categories.length * 50 } : { maxHeight: 50 }]}>
       <TouchableOpacity style={styles.picker} onPress={toggleDropdown}>
         <Text style={styles.selectedText}>
           {selectedCategory
@@ -63,6 +47,7 @@ const CategoryPicker = ({ selectedCategory, onSelectCategory }) => {
         <FlatList
           data={categories}
           keyExtractor={(item) => item.value}
+          nestedScrollEnabled={true} // 안드로이드 스크롤 문제 해결
           renderItem={({ item }) => (
             <TouchableOpacity
               style={[
@@ -83,7 +68,7 @@ const CategoryPicker = ({ selectedCategory, onSelectCategory }) => {
           )}
         />
       )}
-    </Animated.View>
+    </View>
   );
 };
 
@@ -92,7 +77,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray200,
     borderRadius: 8,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.white000,
     overflow: 'hidden', // 내부 요소가 박스를 벗어나지 않도록 설정
   },
   picker: {
@@ -101,7 +86,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#FFF',
+    backgroundColor: colors.white000,
   },
   separator: {
     height: 1, // 구분선 두께

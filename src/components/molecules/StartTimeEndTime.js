@@ -95,6 +95,7 @@ const styles = StyleSheet.create({
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
   },
   requiredMarker: {
     fontSize: 16,
@@ -104,7 +105,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontFamily: fonts.semiBold,
-    marginBottom: 16,
     color: colors.gray800,
   },
   timeRow: {
