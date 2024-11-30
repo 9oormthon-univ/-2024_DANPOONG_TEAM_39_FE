@@ -31,12 +31,12 @@ const TimeBlockList = ({ tasks, weekDates }) => {
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
 
   const categoryColors = {
-    '식사': colors.scheduleMeal,
-    '병원': colors.scheduleHospital,
-    '복약': colors.scheduleMeal,
-    '휴식': colors.scheduleBreak,
-    '기타': colors.scheduleEtc,
-    '내 일정': colors.gray400,
+    'meal': colors.scheduleMeal,
+    'hospital': colors.scheduleHospital,
+    'medication': colors.scheduleMeal,
+    'rest': colors.scheduleBreak,
+    'others': colors.scheduleEtc,
+    'mycalendar': colors.gray400,
   };
 
   const handleOpenPopup = (startTime, endTime) => {

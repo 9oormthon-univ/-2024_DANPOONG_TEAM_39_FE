@@ -58,32 +58,32 @@ const DailySchedule = ({ selectedDate }) => {
     // category에 따라 컴포넌트와 색상 선택
     const getScheduleComponent = (category) => {
       switch (category) {
-        case '식사':
+        case 'meal':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleMeal,
           };
-        case '병원':
+        case 'hospital':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleHospital,
           };
-        case '복약':
+        case 'medication':
           return {
             Component: DailySchedulePill,
             color: colors.scheduleMeal,
           };
-        case '휴식':
+        case 'rest':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleBreak,
           };
-        case '기타':
+        case 'others':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleEtc,
           };
-        case '내 일정':
+        case 'mycalendar':
           return {
             Component: DailyScheduleDefault,
             color: colors.gray400,
