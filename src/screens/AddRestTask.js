@@ -36,15 +36,10 @@ const AddRestTask = ({ route }) => {
   const [isAlarm, setIsAlarm] = useState(false);
   const [location, setLocation] = useState('');
   const [memo, setMemo] = useState('');
-  const [isShared, setIsShared] = useState(false);
+  const [isShared, setIsShared] = useState(true);
   const [careAssignment, setCareAssignment] = useState(null);
   const [careAssignmentId, setCareAssignmentId] = useState(null);
-  const [meal, setMeal] = useState(null);
-  const [hospital, setHospital] = useState(null);
   const [rest, setRest] = useState(null);
-  const [medications, setMedications] = useState([]);
-  const [others, setOthers] = useState([]);
-  const [myCalendar, setMyCalendar] = useState(null);
   const [category, setCategory] = useState('rest');
   const [restType, setRestType] = useState([]);
   const [careAssignments, setCareAssignments] = useState([
@@ -82,7 +77,6 @@ const AddRestTask = ({ route }) => {
   
         setId(data.id);
         setTitle(data.title);
-        setEventType(data.eventType);
         setStartTime(data.startTime);
         setEndTime(data.endTime);
         setDate(data.date);
@@ -94,12 +88,8 @@ const AddRestTask = ({ route }) => {
         setIsShared(data.isShared);
         setCareAssignment(data.careAssignment);
         setCareAssignmentId(data.careAssignmentId);
-        setMeal(data.meal);
-        setHospital(data.hospital);
+        setSelectedProfile(data.careAssignmentId); // 선택된 돌보미를 UI에 반영
         setRest(data.rest);
-        setMedications(data.medications);
-        setOthers(data.others);
-        setMyCalendar(data.myCalendar);
         setCategory(data.category);
         setCareAssignments(data.careAssignments);
         setRestType(response.data.restType);
@@ -118,6 +108,7 @@ const AddRestTask = ({ route }) => {
     setIsCaregiverNotNeeded(!isCaregiverNotNeeded);
     if (!isCaregiverNotNeeded) {
       setSelectedProfile(null); // '필요하지 않음' 선택 시 프로필 초기화
+      setCareAssignmentId(null);
     }
   };
 
@@ -139,39 +130,66 @@ const AddRestTask = ({ route }) => {
     }
   };
 
-  // const handleRegister = async () => {
-  //   const payload = {
-  //     id,
-  //     title,
-  //     eventType,
-  //     startTime,
-  //     endTime,
-  //     date,
-  //     repeatCycle,
-  //     isAllDay,
-  //     isAlarm,
-  //     location,
-  //     memo,
-  //     isShared,
-  //     careAssignment,
-  //     careAssignmentId,
-  //     meal,
-  //     hospital,
-  //     rest,
-  //     medications,
-  //     others,
-  //     myCalendar,
-  //     category,
-  //   };
+  const convertToServerTimeFormat = (time) => {
+    if (!time) return null; // 시간이 없으면 null 반환
+  
+    const [period, rawTime] = time.split(' '); // '오전 10:00' → ['오전', '10:00']
+    const [hours, minutes] = rawTime.split(':').map(Number);
+  
+    let formattedHours = period === '오후' && hours !== 12 ? hours + 12 : hours;
+    if (period === '오전' && hours === 12) formattedHours = 0; // 오전 12시는 0으로 변환
+  
+    return `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
+  };
+  console.log(convertToServerTimeFormat(startTime)); // "10:00:00"
+  console.log(convertToServerTimeFormat(endTime));   // "14:30:00"
+  
+  const convertToServerDateFormat = (date) => {
+    if (!date) return null; // 날짜가 없으면 null 반환
+  
+    // "2024년 12월 1일"에서 숫자만 추출
+    const match = date.match(/(\d{4})년\s(\d{1,2})월\s(\d{1,2})일/);
+    if (!match) {
+      console.error(`Invalid date format: ${date}`);
+      return null;
+    }
+  
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`; // "YYYY-MM-DD" 형식 반환
+  };
+  console.log(date);
+  console.log(convertToServerDateFormat(date)); 
 
-  //   try {
-  //     const response = await axios.post('http://34.236.139.89:8080/api/careCalendar/rest', payload);
-  //     console.log('Successfully posted data:', response.data);
-  //     navigation.replace('HomeScreen');
-  //   } catch (error) {
-  //     console.error('Error posting data:', error);
-  //   }
-  // };
+  
+
+  const handleRegister = async () => {
+    const payload = {
+      title,
+      eventType,
+      startTime: convertToServerTimeFormat(startTime),
+      endTime: convertToServerTimeFormat(endTime),
+      date: convertToServerDateFormat(date),
+      repeatCycle,
+      isAllDay,
+      isAlarm,
+      location,
+      memo,
+      isShared,
+      careAssignment,
+      careAssignmentId: selectedProfile,
+      restType: rest,
+      category,
+      
+    };
+
+    try {
+      const response = await axios.post('http://34.236.139.89:8080/api/careCalendar/rest', payload);
+      console.log('*-*-*-*-*-*\n Successfully posted data:', response.data);
+      navigation.replace('HomeScreen');
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -202,7 +220,12 @@ const AddRestTask = ({ route }) => {
             careAssignments={careAssignments} // 서버에서 가져온 데이터 전달
             selectedProfile={selectedProfile}
             isCaregiverNotNeeded={isCaregiverNotNeeded}
-            onProfileSelect={(profileId) => setSelectedProfile(profileId)}
+            onProfileSelect={(profileId) => {
+              if (!isCaregiverNotNeeded) {
+                setSelectedProfile(profileId);
+                setCareAssignmentId(profileId); // 선택된 프로필 ID를 careAssignmentId로 저장
+              }
+            }}
             onToggleCheck={handleCaregiverToggle}
           />
         </View>
@@ -263,9 +286,9 @@ const AddRestTask = ({ route }) => {
           />
         </View>
 
-        {/* <View style={styles.component}>
+        <View style={styles.component}>
           <TaskAbledButton text="등록" onPress={handleRegister} />
-        </View> */}
+        </View>
       </ScrollView>
     </View>
   );
