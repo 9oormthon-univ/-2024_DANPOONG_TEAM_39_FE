@@ -10,10 +10,10 @@ import textStyles from '../../styles/textStyles';
 const DailyScheduleDefault = ({
                                 time,
                                 title,
-                                hasAlarm = false,
+                                isAlarm = false,
                                 hasRecommendation = false,
                                 location,
-                                hasDolbomi = true,
+                                isShared = true,
                                 color = colors.gray400, // 점과 선의 색상을 하나로 관리
                               }) => {
   return (
@@ -32,7 +32,7 @@ const DailyScheduleDefault = ({
         {/* 텍스트와 아이콘 */}
         <View style={styles.textContainer}>
           <Text style={styles.title}>{title}</Text>
-          {hasAlarm && <AlarmIcon style={styles.alarmIcon} width={16} height={16} />}
+          {isAlarm && <AlarmIcon style={styles.alarmIcon} width={16} height={16} />}
         </View>
 
         {/* 지도 아이콘과 위치 텍스트 */}
@@ -44,7 +44,7 @@ const DailyScheduleDefault = ({
         )}
 
         {/* 돌보미 아이콘 */}
-        {hasDolbomi ? (
+        {isShared ? (
           <DolbomiTrueIcon style={styles.dolbomiIcon} width={16} height={16} />
         ) : (
           <DolbomiFalseIcon style={styles.dolbomiIcon} width={16} height={16} />
