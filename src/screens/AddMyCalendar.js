@@ -2,25 +2,19 @@ import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native'; // React Navigation 훅
 import colors from '../styles/colors';
-
-import CategoryPicker from '../components/atoms/CategoryPicker';
-import CaregiverSelectionRow from '../components/molecules/CaregiverSelectionRow';
 import TaskNameInput from '../components/molecules/TaskNameInput';
 import TaskDatePickerButton from '../components/atoms/TaskDatePickerButton';
 import StartTimeEndTime from '../components/molecules/StartTimeEndTime';
 import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
 import TaskPlace from '../components/molecules/TaskPlace';
 import TaskMemo from '../components/molecules/TaskMemo';
-import SegmentedControl from '../components/atoms/SegmentedControl';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
 import TaskRepeat from '../components/atoms/TaskRepeat';
 import TypeButton from '../components/atoms/TypeButton';
 
 const AddMycalendar = ({ route }) => {
   const navigation = useNavigation(); // 네비게이션 객체 가져오기
-  const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  const [name, setName] = useState(route.params?.familyName || '김구름');
-
+  
   const handleRegister = () => {
     // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
     navigation.replace('HomeScreen'); // 애니메이션 없이 HomeScreen으로 이동
@@ -34,12 +28,6 @@ const AddMycalendar = ({ route }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.component}>
-          <CategoryPicker
-            selectedCategory={selectedCategory}
-            onSelectCategory={(category) => setSelectedCategory(category)}
-          />
-        </View>
         <View style={styles.component}>
           <TaskNameInput />
         </View>

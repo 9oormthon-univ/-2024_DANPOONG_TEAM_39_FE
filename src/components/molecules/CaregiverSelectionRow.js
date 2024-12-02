@@ -1,86 +1,76 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Ionicons 사용
+import React from 'react';
+import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
-import profiles from '../../datas/Profiles'; // Profiles 데이터 임포트
 
-const CaregiverSelectionRow = ({ label, onValueChange }) => {
-  const [isChecked, setIsChecked] = useState(false); // 체크박스 상태
-  const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필
-
-  const handleToggle = () => {
-    setIsChecked(!isChecked);
-    setSelectedProfile(null); // 체크박스 활성화 시 선택된 프로필 초기화
-    const newValue = !isChecked ? '없음' : '필요';
-    onValueChange?.(newValue);
-  };
-
-  const handleProfileSelect = (profileId) => {
-    if (isChecked) return; // 체크박스 활성화 시 프로필 선택 불가
-    setSelectedProfile(profileId);
-  };
-
+const CaregiverSelectionRow = ({
+  careAssignments,
+  selectedProfile,
+  isCaregiverNotNeeded,
+  onProfileSelect,
+  onToggleCheck,
+}) => {
   return (
     <View style={styles.container}>
-      {/* 첫 번째 행: Label과 체크박스 */}
+      {/* 첫 번째 행: 체크박스 */}
       <View style={styles.rowContainer}>
         <View style={styles.labelContainer}>
           <Text style={styles.requiredMarker}>*</Text>
-          <Text style={styles.labelText}>{label}</Text>
+          <Text style={styles.label}>돌보미 선택</Text>
         </View>
-        <View style={styles.checkboxContainer}>
-          <Text style={styles.checkboxLabel}>필요하지 않음</Text>
+        <View style={styles.checkBoxRow}>
+          <Text style={styles.checkBoxLabel}>필요하지 않음</Text>
           <TouchableOpacity
             style={[
               styles.checkBox,
-              { backgroundColor: isChecked ? colors.primary004 : colors.gray200 },
+              { backgroundColor: isCaregiverNotNeeded ? colors.primary004 : colors.gray200 },
             ]}
-            onPress={handleToggle}
+            onPress={onToggleCheck}
           >
-            {isChecked && (
-              <Icon name="checkmark" size={20} color={colors.primary001} />
+            {isCaregiverNotNeeded && (
+              <Icon name="checkmark" size={16} color={colors.primary001} />
             )}
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* 두 번째 행: FamilyProfile 리스트 */}
+      {/* 두 번째 행: 프로필 목록 */}
       <FlatList
-        data={profiles.slice(1)} // 첫 번째 프로필 제외
-        keyExtractor={(item) => item.id.toString()} // 고유 키 설정
+        data={careAssignments}
+        keyExtractor={(item, index) => (item.id ? item.id.toString() : `temp-${index}`)} // 안전한 키 생성
         horizontal
-        showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.profileContainer}
-            onPress={() => handleProfileSelect(item.id)}
+            style={[
+              styles.profileContainer,
+              selectedProfile === item.id && styles.selectedProfile, // 선택된 프로필 강조
+            ]}
+            onPress={() => !isCaregiverNotNeeded && onProfileSelect(item.id)}
+            disabled={isCaregiverNotNeeded} // 필요하지 않음 체크 시 비활성화
           >
             <View
               style={[
                 styles.profileImageWrapper,
-                selectedProfile === item.id && !isChecked && styles.selectedProfile, // 선택된 프로필 보더
+                selectedProfile === item.id && styles.selectedProfileBorder, // 선택된 프로필에 보더 추가
               ]}
             >
-              <Image source={item.imagePath} style={styles.profileImage} />
+              <Image
+                source={require('../../assets/images/profile_me.png')} // 기본 프로필 이미지
+                style={styles.profileImage}
+              />
             </View>
             <Text
               style={[
                 styles.profileName,
-                isChecked
-                  ? { color: colors.gray400 } // 체크박스가 활성화된 경우
-                  : selectedProfile === item.id
-                  ? { color: colors.primary001 } // 선택된 프로필
-                  : { color: colors.gray800 }, // 기본 상태
+                isCaregiverNotNeeded && { color: colors.gray400 }, // 필요하지 않음 체크 시 색상 변경
               ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
             >
-              {item.name}
+              {item.member?.alias || '이름 없음'}
             </Text>
           </TouchableOpacity>
         )}
-        contentContainerStyle={styles.profileListContainer} // FlatList 스타일
+        contentContainerStyle={styles.profileListContainer}
       />
     </View>
   );
@@ -94,46 +84,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
   },
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 16,
   },
-  requiredMarker: {
-    fontSize: 16,
-    color: colors.primary001,
+  requiredMarker: { 
+    fontSize: 16, 
+    fontFamily: fonts.semiBold, 
+    color: colors.primary001, 
     marginRight: 4,
   },
-  labelText: {
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
+  label: { 
+    fontSize: 16, 
+    fontFamily: fonts.semiBold, 
     color: colors.gray800,
   },
-  checkboxContainer: {
+  checkBoxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  checkboxLabel: {
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    color: colors.gray800,
-    marginRight: 8,
+    marginBottom: 16,
   },
   checkBox: {
     width: 24,
     height: 24,
     borderRadius: 4,
-    backgroundColor: colors.gray200,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkBoxLabel: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.gray800,
+    marginRight: 8,
   },
   profileListContainer: {
     paddingHorizontal: 8,
   },
   profileContainer: {
     alignItems: 'center',
-    marginRight: 12, // 프로필 간격 설정
+    marginRight: 12,
   },
   profileImageWrapper: {
     width: 64,
@@ -143,7 +134,10 @@ const styles = StyleSheet.create({
     borderColor: 'transparent', // 기본 상태에서는 보더 없음
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8, // 이미지와 이름 간격
+    marginBottom: 8,
+  },
+  selectedProfileBorder: {
+    borderColor: colors.primary001, // 선택된 프로필 보더 색상
   },
   profileImage: {
     width: 58,
@@ -153,8 +147,9 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 14,
     lineHeight: 21,
-    fontFamily: fonts.semiBold, // 세미볼드체 사용
+    fontFamily: fonts.semiBold,
     textAlign: 'center',
+    color: colors.gray800,
   },
   selectedProfile: {
     borderColor: colors.primary001, // 선택된 프로필 보더 색상
