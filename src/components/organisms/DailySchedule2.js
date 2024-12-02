@@ -10,10 +10,10 @@ import { StyleSheet, FlatList, View } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
 import DailyScheduleEmpty from '../atoms/DailyScheduleEmpty';
 import DailySchedulePill from '../atoms/DailySchedulePill';
-import MockTasks from '../../datas/MockTasks2'; // Mock 데이터 가져오기
+import MockTasks from '../../datas/MockTasks'; // Mock 데이터 가져오기
 import colors from '../../styles/colors'; // 색상 가져오기
 
-const DailySchedule = ({ selectedDate }) => {
+const DailySchedule2 = ({ selectedDate }) => {
   // 선택된 날짜에 해당하는 일정 필터링
   const filteredSchedule = MockTasks.filter((task) => task.date === selectedDate);
 
@@ -58,32 +58,32 @@ const DailySchedule = ({ selectedDate }) => {
     // category에 따라 컴포넌트와 색상 선택
     const getScheduleComponent = (category) => {
       switch (category) {
-        case '식사':
+        case 'meal':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleMeal,
           };
-        case '병원':
+        case 'hospital':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleHospital,
           };
-        case '복약':
+        case 'medication':
           return {
             Component: DailySchedulePill,
             color: colors.scheduleMeal,
           };
-        case '휴식':
+        case 'rest':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleBreak,
           };
-        case '기타':
+        case 'others':
           return {
             Component: DailyScheduleDefault,
             color: colors.scheduleEtc,
           };
-        case '내 일정':
+        case 'myCalendar':
           return {
             Component: DailyScheduleDefault,
             color: colors.gray400,
@@ -104,9 +104,9 @@ const DailySchedule = ({ selectedDate }) => {
         time={item.startTime}
         title={item.title}
         location={item.location}
-        hasAlarm={item.hasAlarm} // MockTasks에서 가져온 값 적용
+        isAlarm={item.isAlarm} // MockTasks에서 가져온 값 적용
         hasRecommendation={item.hasRecommendation} // MockTasks에서 가져온 값 적용
-        hasDolbomi={item.hasDolbomi} // MockTasks에서 가져온 값 적용
+        isShared={item.isShared} // MockTasks에서 가져온 값 적용
         color={color}
       />
     );
@@ -134,4 +134,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DailySchedule;
+export default DailySchedule2;

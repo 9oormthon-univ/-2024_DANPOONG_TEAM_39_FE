@@ -36,7 +36,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
     'medication': colors.scheduleMeal,
     'rest': colors.scheduleBreak,
     'others': colors.scheduleEtc,
-    'mycalendar': colors.gray400,
+    'myCalendar': colors.gray400,
   };
 
   const handleOpenPopup = (startTime, endTime) => {
