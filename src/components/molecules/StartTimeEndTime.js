@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import TimePicker from '../atoms/TimePicker'; // TimePicker 컴포넌트 임포트
 import Icon from 'react-native-vector-icons/Ionicons'; // 체크박스 아이콘
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const StartTimeEndTime = () => {
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
-  const [isChecked, setIsChecked] = useState(false); // 체크박스 상태 추가
-
-  const sleepTimeStart = 22; // 수면 시작 시간
-  const sleepTimeEnd = 6; // 수면 종료 시간
-
+const StartTimeEndTime = ({
+  startTime,
+  endTime,
+  isChecked,
+  defaultStart = '오전 6:00',
+  defaultEnd = '오후 10:00',
+  onStartTimeChange,
+  onEndTimeChange,
+  onToggleCheck,
+}) => {
   const calculateTotalTime = (start, end) => {
     if (!start || !end) return '0';
 
@@ -36,17 +38,6 @@ const StartTimeEndTime = () => {
     return `${hours}`;
   };
 
-  const handleToggle = () => {
-    setIsChecked(!isChecked); // 체크박스 상태 토글
-    if (!isChecked) {
-      setStartTime(`오전 ${sleepTimeEnd}:00`);
-      setEndTime(`오후 ${(sleepTimeStart % 12 || 12)}:00`);
-    } else {
-      setStartTime(null);
-      setEndTime(null);
-    }
-  };
-
   const totalTime = calculateTotalTime(startTime, endTime);
 
   return (
@@ -58,13 +49,23 @@ const StartTimeEndTime = () => {
 
       {/* 시작 시간 */}
       <View style={styles.timeRow}>
-        <TimePicker placeholder="시작 시간" onTimeChange={setStartTime} />
+        <TimePicker
+          placeholder={isChecked ? defaultStart : '시작 시간'} // 체크박스 상태에 따라 placeholder 변경
+          time={startTime}
+          onTimeChange={onStartTimeChange} // 부모에게 시작 시간 전달
+          editable={!isChecked} // 체크박스 선택 시 비활성화
+        />
         <Text style={styles.timeLabel}>부터</Text>
       </View>
 
       {/* 종료 시간 */}
       <View style={styles.timeRow}>
-        <TimePicker placeholder="종료 시간" onTimeChange={setEndTime} />
+        <TimePicker
+          placeholder={isChecked ? defaultEnd : '종료 시간'} // 체크박스 상태에 따라 placeholder 변경
+          time={endTime}
+          onTimeChange={onEndTimeChange} // 부모에게 종료 시간 전달
+          editable={!isChecked} // 체크박스 선택 시 비활성화
+        />
         <Text style={styles.timeLabel}>까지</Text>
       </View>
 
@@ -75,14 +76,29 @@ const StartTimeEndTime = () => {
           <Text style={styles.timeValue}>{totalTime}</Text>
           <Text style={styles.grayText}> 시간</Text>
         </Text>
+
         <TouchableOpacity
-          style={[
-            styles.checkBox,
-            { backgroundColor: isChecked ? colors.primary004 : colors.gray200 },
-          ]}
-          onPress={handleToggle}
+          style={styles.checkboxContainer}
+          onPress={() => {
+            onToggleCheck();
+            if (!isChecked) {
+              onStartTimeChange(defaultStart); // 기본 시작 시간 설정
+              onEndTimeChange(defaultEnd); // 기본 종료 시간 설정
+            } else {
+              onStartTimeChange(''); // 시간 초기화
+              onEndTimeChange('');
+            }
+          }}
         >
-          {isChecked && <Icon name="checkmark" size={20} color={colors.primary001} />}
+          <View
+            style={[
+              styles.checkBox,
+              { backgroundColor: isChecked ? colors.primary004 : colors.gray200 },
+            ]}
+          >
+            {isChecked && <Icon name="checkmark" size={20} color={colors.primary001} />}
+          </View>
+          <Text style={styles.checkboxLabel}>종일</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -90,8 +106,7 @@ const StartTimeEndTime = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-  },
+  container: {},
   labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -139,12 +154,22 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.primary001,
   },
+  checkboxContainer: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+  },
   checkBox: {
     width: 24,
     height: 24,
     borderRadius: 4,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.gray800,
+    marginRight: 8,
   },
 });
 

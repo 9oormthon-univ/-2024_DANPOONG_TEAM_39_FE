@@ -6,19 +6,7 @@ import fonts from '../../styles/fonts';
 import PencilLineIcon from '../../assets/images/pencil_line.svg'; // 기본 아이콘
 import CheckedPencilLineIcon from '../../assets/images/checked_pencil_line.svg'; // 체크된 상태의 아이콘
 
-const TaskPlace = ({ label = '장소' }) => {
-  const [isChecked, setIsChecked] = useState(false);
-  const [place, setPlace] = useState(''); // 텍스트 필드 상태
-
-  const handleToggle = () => {
-    setIsChecked(!isChecked);
-    if (!isChecked) {
-      setPlace('자택'); // 체크 시 "자택"으로 고정
-    } else {
-      setPlace(''); // 체크 해제 시 텍스트 필드 초기화
-    }
-  };
-
+const TaskPlace = ({ label = '장소', location, isChecked, onValueChange, onToggleCheck }) => {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -33,7 +21,7 @@ const TaskPlace = ({ label = '장소' }) => {
               styles.checkBox,
               { backgroundColor: isChecked ? colors.primary004 : colors.gray200 },
             ]}
-            onPress={handleToggle}
+            onPress={onToggleCheck} // 부모의 상태 변경 함수 호출
           >
             {isChecked && (
               <Icon name="checkmark" size={16} color={colors.primary001} />
@@ -51,8 +39,8 @@ const TaskPlace = ({ label = '장소' }) => {
           ]}
           placeholder="장소 입력"
           placeholderTextColor={colors.gray400}
-          value={place} // 텍스트 필드 값
-          onChangeText={setPlace} // 값 변경 핸들러
+          value={location} // 부모 상태로부터 전달받은 값
+          onChangeText={onValueChange} // 부모에 값 전달
           editable={!isChecked} // 체크 시 비활성화
         />
         {/* 아이콘 변경 */}
@@ -65,6 +53,7 @@ const TaskPlace = ({ label = '장소' }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

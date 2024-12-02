@@ -3,24 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const SegmentedControl = ({ segments, onSegmentPress, selectedSegments, label, isRequired }) => {
-  const [selected, setSelected] = useState(selectedSegments || []);
-
-  const handleSegmentPress = (value) => {
-    let updatedSelection;
-
-    if (selected.includes(value)) {
-      // 이미 선택된 세그먼트인 경우 제거
-      updatedSelection = selected.filter((segment) => segment !== value);
-    } else {
-      // 선택되지 않은 세그먼트를 추가
-      updatedSelection = [...selected, value];
-    }
-
-    setSelected(updatedSelection);
-    onSegmentPress(updatedSelection); // 변경된 선택값을 부모 컴포넌트로 전달
-  };
-
+const SegmentedControl = ({ segments, onSegmentPress, selectedSegment, label, isRequired }) => {
   return (
     <View style={styles.wrapper}>
       {/* 라벨과 (required) */}
@@ -38,16 +21,16 @@ const SegmentedControl = ({ segments, onSegmentPress, selectedSegments, label, i
             <TouchableOpacity
               style={[
                 styles.segment,
-                selected.includes(segment.value) && styles.selectedSegment, // 선택된 세그먼트 강조
+                selectedSegment === segment.value && styles.selectedSegment, // 선택된 세그먼트 강조
                 index === 0 && styles.leftRounded, // 왼쪽 끝 모서리 둥글게
                 index === segments.length - 1 && styles.rightRounded, // 오른쪽 끝 모서리 둥글게
               ]}
-              onPress={() => handleSegmentPress(segment.value)}
+              onPress={() => onSegmentPress(segment.value)}
             >
               <Text
                 style={[
                   styles.segmentText,
-                  selected.includes(segment.value) && styles.selectedText, // 선택된 텍스트 강조
+                  selectedSegment === segment.value && styles.selectedText, // 선택된 텍스트 강조
                 ]}
               >
                 {segment.label}
@@ -83,7 +66,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white000,
     borderRadius: 8,
     overflow: 'hidden', // 모서리 둥글게
     borderWidth: 1,
@@ -94,7 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white000,
   },
   selectedSegment: {
     borderWidth: 2,
