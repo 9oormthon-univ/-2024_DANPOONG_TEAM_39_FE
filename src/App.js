@@ -5,8 +5,9 @@ import { enableScreens } from 'react-native-screens'; // react-native-screens �
 import SplashScreen from './screens/SplashScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import LoginScreen from './screens/LoginScreen';
+import AddCareFamily from './screens/AddCareFamily';
 import HomeScreen from './screens/HomeScreen';
-
+import EnterCaregiverModal from './components/organisms/EnterCaregiverModal';
 import AddTasksHeader from './components/templates/AddTasksHeader'; // 커스텀 헤더
 import AddPillTask from './screens/AddPillTask'; 
 import AddMealTask from './screens/AddMealTask';
@@ -26,6 +27,8 @@ export default function App() {
         <Stack.Screen name="SplashScreen" component={SplashScreen} options={{ headerShown: false }} />
         <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} options={{ headerShown: false }} />
         <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="AddCareFamily" component={AddCareFamily} options={{ headerShown: false }} />
+        <Stack.Screen name="EnterCaregiverModal" component={EnterCaregiverModal} options={{ headerShown: false }} />
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
 
         {/* 일정 추가 화면 */}

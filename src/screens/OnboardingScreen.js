@@ -51,7 +51,7 @@ const OnboardingScreen = ({ navigation }) => {
         setShowWebView(false); // WebView 닫기
 
         // 홈 화면으로 이동하며 Authorization Code 전달
-        navigation.replace('HomeScreen', { code });
+        navigation.replace('AddCareFamily', { code });
       }
     }
   };
