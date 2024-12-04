@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
+
+
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import axios from 'axios';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
 import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
@@ -26,22 +32,51 @@ const calculateBlockHeight = (startTime, endTime) => {
   return end - start;
 };
 
-const TimeBlockList = ({ tasks, weekDates }) => {
+const TimeBlockList = ({ weekDates }) => {
+  const [tasks, setTasks] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
+  const [loading, setLoading] = useState(true);
 
   const categoryColors = {
-    'meal': colors.scheduleMeal,
-    'hospital': colors.scheduleHospital,
-    'medication': colors.scheduleMeal,
-    'rest': colors.scheduleBreak,
-    'others': colors.scheduleEtc,
-    'myCalendar': colors.gray400,
+    meal: colors.scheduleMeal,
+    hospital: colors.scheduleHospital,
+    medication: colors.scheduleMeal,
+    rest: colors.scheduleBreak,
+    others: colors.scheduleEtc,
+    myCalendar: colors.gray400,
   };
 
-  const handleOpenPopup = (time, endTime, date) => {
-    setPopupInfo({ time, endTime, date }); // 팝업에 표시할 정보 설정
-    console.log("위클리팝업ㄴㄴ"+date, time, endTime);
+  // API 호출
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/all');
+        const apiTasks = response.data.map((task) => ({
+          id: String(task.id),
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false,
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setTasks(apiTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleOpenPopup = (startTime, endTime) => {
+    setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
     setPopupVisible(true); // 팝업 열기
   };
 
@@ -49,98 +84,87 @@ const TimeBlockList = ({ tasks, weekDates }) => {
     setPopupVisible(false); // 팝업 닫기
   };
 
-  return (
+  if (loading) {
+    return (
       <View style={styles.timelineContainer}>
-        {/* 시간 슬롯 표시: 오전 9시부터 시작 */}
-        {Array.from({ length: 24 - START_HOUR }).map((_, index) => (
-            <View
-                key={index + START_HOUR}
-                style={[styles.timeSlot, index === 0 && styles.firstTimeSlot]}
-            >
-              <Text style={styles.timeText}>
-                {index + START_HOUR < 12 ? '오전\n' : '오후\n'}{' '}
-                {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
-              </Text>
-            </View>
-        ))}
+        <Text>Loading tasks...</Text>
+      </View>
+    );
+  }
 
-        {/* 날짜별 Task 처리 */}
-        {weekDates.map((weekDate) => {
-          const tasksOnDate = tasks
-              .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
-              .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
+  return (
+    <View style={styles.timelineContainer}>
+      {/* 시간 슬롯 표시: 오전 9시부터 시작 */}
+      {Array.from({ length: 24 - START_HOUR }).map((_, index) => (
+        <View
+          key={index + START_HOUR}
+          style={[
+            styles.timeSlot,
+            index === 0 && styles.firstTimeSlot,
+          ]}
+        >
+          <Text style={styles.timeText}>
+            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}
+            {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
+          </Text>
+        </View>
+      ))}
 
-          return tasksOnDate.map((task, index) => {
-            const top = timeToPosition(task.startTime);
-            const height = calculateBlockHeight(task.startTime, task.endTime);
+      {/* 날짜별 Task 처리 */}
+      {weekDates.map((weekDate) => {
+        const tasksOnDate = tasks
+          .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
+          .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
 
-            const currentDay = weekDates.findIndex(
-                (date) => date.format('YYYY-MM-DD') === task.date
-            );
+        return tasksOnDate.map((task, index) => {
+          const top = timeToPosition(task.startTime);
+          const height = calculateBlockHeight(task.startTime, task.endTime);
 
-            if (currentDay === -1) return null;
+          const currentDay = weekDates.findIndex(
+            (date) => date.format('YYYY-MM-DD') === task.date
+          );
 
-            const totalWidth = 100 - LEFT_PADDING - RIGHT_PADDING - GAP_BETWEEN_COLUMNS * (DAYS_IN_WEEK - 1);
-            const widthPercentage = totalWidth / DAYS_IN_WEEK;
-            const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
+          if (currentDay === -1) return null;
 
-            const backgroundColor = categoryColors[task.category];
+          const totalWidth = 100 - LEFT_PADDING - RIGHT_PADDING - GAP_BETWEEN_COLUMNS * (DAYS_IN_WEEK - 1);
+          const widthPercentage = totalWidth / DAYS_IN_WEEK;
+          const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
-            // 공백 계산
-            if (index > 0) {
-              const previousTask = tasksOnDate[index - 1];
-              const prevEnd = timeToPosition(previousTask.endTime);
-              const currentStart = top;
+          const backgroundColor = categoryColors[task.category];
 
-              if (currentStart > prevEnd) {
-                const gapHeight = currentStart - prevEnd;
+          // 공백 계산
+          if (index > 0) {
+            const previousTask = tasksOnDate[index - 1];
+            const prevEnd = timeToPosition(previousTask.endTime);
+            const currentStart = top;
 
-                return (
-                    <React.Fragment key={`gap-${task.id}`}>
-                      {/* 공백 블록 */}
-                      <TouchableOpacity
-                          style={[
-                            styles.alertBlock,
-                            {
-                              top: prevEnd,
-                              height: gapHeight,
-                              left: `${leftPercentage}%`,
-                              width: `${widthPercentage}%`,
-                            },
-                          ]}
-                          onPress={() =>
-                              handleOpenPopup(task.startTime, previousTask.endTime, task.date)
-                          } // 팝업 열기
-                      >
-                        <View style={styles.alertIcon}>
-                          <Image source={AlertIcon} style={styles.alertIconImage} />
-                        </View>
-                      </TouchableOpacity>
+            if (currentStart > prevEnd) {
+              const gapHeight = currentStart - prevEnd;
 
-                      {/* 현재 Task */}
-                      <View
-                          style={[
-                            styles.block,
-                            {
-                              top,
-                              height,
-                              left: `${leftPercentage}%`,
-                              width: `${widthPercentage}%`,
-                              backgroundColor,
-                            },
-                          ]}
-                      >
-                        <Text style={styles.blockText}>{task.title}</Text>
-                      </View>
-                    </React.Fragment>
-                );
-              }
-            }
+              return (
+                <React.Fragment key={`gap-${task.id}`}>
+                  {/* 공백 블록 */}
+                  <TouchableOpacity
+                    style={[
+                      styles.alertBlock,
+                      {
+                        top: prevEnd,
+                        height: gapHeight,
+                        left: `${leftPercentage}%`,
+                        width: `${widthPercentage}%`,
+                      },
+                    ]}
+                    onPress={() =>
+                      handleOpenPopup(previousTask.endTime, task.startTime)
+                    }
+                  >
+                    <View style={styles.alertIcon}>
+                      <Image source={AlertIcon} style={styles.alertIconImage} />
+                    </View>
+                  </TouchableOpacity>
 
-            // Task 블록 렌더링
-            return (
-                <View
-                    key={task.id}
+                  {/* 현재 Task */}
+                  <View
                     style={[
                       styles.block,
                       {
@@ -151,29 +175,45 @@ const TimeBlockList = ({ tasks, weekDates }) => {
                         backgroundColor,
                       },
                     ]}
-                >
-                  <Text style={styles.blockText}>{task.title}</Text>
-                </View>
-            );
-          });
-        })}
+                  >
+                    <Text style={styles.blockText}>{task.title}</Text>
+                  </View>
+                </React.Fragment>
+              );
+            }
+          }
 
-        {/* 팝업 컴포넌트 */}
-        <Modal
-            visible={popupVisible}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={handleClosePopup}
-        >
-          <Popup
-              info={popupInfo}
-              onClose={handleClosePopup}
-              time={popupInfo?.time}  // popupInfo에서 time 전달
-              endTime={popupInfo?.endTime}  // popupInfo에서 endTime 전달
-              date={popupInfo?.date}  // popupInfo에서 date 전달
-          />
-        </Modal>
-      </View>
+          // Task 블록 렌더링
+          return (
+            <View
+              key={task.id}
+              style={[
+                styles.block,
+                {
+                  top,
+                  height,
+                  left: `${leftPercentage}%`,
+                  width: `${widthPercentage}%`,
+                  backgroundColor,
+                },
+              ]}
+            >
+              <Text style={styles.blockText}>{task.title}</Text>
+            </View>
+          );
+        });
+      })}
+
+      {/* 팝업 컴포넌트 */}
+      <Modal
+        visible={popupVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleClosePopup}
+      >
+        <Popup info={popupInfo} onClose={handleClosePopup} />
+      </Modal>
+    </View>
   );
 };
 

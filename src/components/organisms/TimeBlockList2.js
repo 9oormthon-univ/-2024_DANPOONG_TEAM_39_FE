@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
+
+
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import axios from 'axios';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
 import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
@@ -26,28 +32,65 @@ const calculateBlockHeight = (startTime, endTime) => {
   return end - start;
 };
 
-const TimeBlockList2 = ({ tasks, weekDates }) => {
+const TimeBlockList = ({ weekDates }) => {
+  const [tasks, setTasks] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
+  const [loading, setLoading] = useState(true);
 
   const categoryColors = {
-    'meal': colors.scheduleMeal,
-    'hospital': colors.scheduleHospital,
-    'medication': colors.scheduleMeal,
-    'rest': colors.scheduleBreak,
-    'others': colors.scheduleEtc,
-    'myCalendar': colors.gray400,
+    meal: colors.scheduleMeal,
+    hospital: colors.scheduleHospital,
+    medication: colors.scheduleMeal,
+    rest: colors.scheduleBreak,
+    others: colors.scheduleEtc,
+    myCalendar: colors.gray400,
   };
 
-  const handleOpenPopup = (date, time, endTime) => {
-    setPopupInfo({date, time, endTime }); // 팝업에 표시할 정보 설정
+  // API 호출
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/calendar/1');
+        const apiTasks = response.data.data.map((task, index) => ({
+          id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false, // API에 없는 경우 기본값 설정
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setTasks(apiTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleOpenPopup = (startTime, endTime) => {
+    setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
     setPopupVisible(true); // 팝업 열기
   };
-
 
   const handleClosePopup = () => {
     setPopupVisible(false); // 팝업 닫기
   };
+
+  if (loading) {
+    return (
+      <View style={styles.timelineContainer}>
+        <Text>Loading tasks...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.timelineContainer}>
@@ -61,7 +104,7 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
           ]}
         >
           <Text style={styles.timeText}>
-            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}{' '}
+            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}
             {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
           </Text>
         </View>
@@ -112,10 +155,10 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
                       },
                     ]}
                     onPress={() =>
-                        handleOpenPopup(task.date, previousTask.endTime, task.startTime)
-                    } // 팝업 열기
+                      handleOpenPopup(previousTask.endTime, task.startTime)
+                    }
                   >
-                    <View style={styles.alertIcon}>s
+                    <View style={styles.alertIcon}>
                       <Image source={AlertIcon} style={styles.alertIconImage} />
                     </View>
                   </TouchableOpacity>
@@ -163,18 +206,12 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
 
       {/* 팝업 컴포넌트 */}
       <Modal
-          visible={popupVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={handleClosePopup}
+        visible={popupVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleClosePopup}
       >
-        <Popup
-            info={popupInfo}
-            onClose={handleClosePopup}
-            time={popupInfo?.time}  // popupInfo에서 time 전달
-            endTime={popupInfo?.endTime}  // popupInfo에서 endTime 전달
-            date={popupInfo?.date}  // popupInfo에서 date 전달
-        />
+        <Popup info={popupInfo} onClose={handleClosePopup} />
       </Modal>
     </View>
   );
@@ -238,4 +275,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TimeBlockList2;
+export default TimeBlockList;
