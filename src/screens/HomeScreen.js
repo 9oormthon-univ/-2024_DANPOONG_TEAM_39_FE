@@ -9,7 +9,6 @@ import TimeBlockList from '../components/organisms/TimeBlockList';
 import TimeBlockList2 from '../components/organisms/TimeBlockList2'; // 김구름 전용
 import DailySchedule from '../components/organisms/DailySchedule';
 import DailySchedule2 from '../components/organisms/DailySchedule2'; // 김구름 전용
-import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -53,7 +52,7 @@ const HomeScreen = () => {
           { height: familyListHeight, opacity: familyListOpacity },
         ]}
       >
-        <FamilyList Profiles={Profiles} onSelectProfile={setSelectedProfile} />
+        <FamilyList onSelectProfile={setSelectedProfile} />
       </Animated.View>
 
       {/* CalendarDatepicker + WeekDays 컴포넌트 */}
