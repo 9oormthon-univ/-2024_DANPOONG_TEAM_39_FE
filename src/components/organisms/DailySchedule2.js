@@ -1,22 +1,89 @@
 import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
 
-// 특정 경고 메시지 무시
-LogBox.ignoreLogs([
-  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
-]);
 
-import React from 'react';
-import { StyleSheet, FlatList, View } from 'react-native';
+
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, FlatList, View, Text } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
+import DailyScheduleEmpty from '../atoms/DailyScheduleEmpty';
 import DailySchedulePill from '../atoms/DailySchedulePill';
-import MockTasks from '../../datas/MockTasks'; // Mock 데이터 가져오기
+import axios from 'axios';
 import colors from '../../styles/colors'; // 색상 가져오기
 
-const DailySchedule2 = ({ selectedDate }) => {
+const DailySchedule = ({ selectedDate }) => {
+  const [mockTasks, setMockTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // API에서 데이터 가져오기
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/calendar/1');
+        const apiTasks = response.data.data.map((task, index) => ({
+          id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false, // API에 없는 경우 기본값 설정
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setMockTasks(apiTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
   // 선택된 날짜에 해당하는 일정 필터링
-  const filteredSchedule = MockTasks.filter((task) => task.date === selectedDate);
+  const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
+
+  // 공백 시간을 계산하고 공백 블록 추가
+  const calculateEmptyBlocks = (schedule) => {
+    const sortedSchedule = [...schedule].sort((a, b) => {
+      const timeA = new Date(`1970-01-01T${a.startTime}:00Z`);
+      const timeB = new Date(`1970-01-01T${b.startTime}:00Z`);
+      return timeA - timeB;
+    });
+
+    const completeSchedule = [];
+    for (let i = 0; i < sortedSchedule.length; i++) {
+      completeSchedule.push(sortedSchedule[i]);
+
+      if (i < sortedSchedule.length - 1) {
+        const currentEndTime = new Date(`1970-01-01T${sortedSchedule[i].endTime}:00Z`);
+        const nextStartTime = new Date(`1970-01-01T${sortedSchedule[i + 1].startTime}:00Z`);
+
+        if (currentEndTime < nextStartTime) {
+          completeSchedule.push({
+            type: 'empty',
+            startTime: sortedSchedule[i].endTime,
+            endTime: sortedSchedule[i + 1].startTime,
+            color: colors.gray200,
+          });
+        }
+      }
+    }
+    return completeSchedule;
+  };
+
+  // 공백 시간을 포함한 전체 일정
+  const completeSchedule = calculateEmptyBlocks(filteredSchedule);
 
   const renderScheduleItem = ({ item }) => {
+    // 공백 블록 렌더링
+    if (item.type === 'empty') {
+      return <DailyScheduleEmpty time={item.startTime} endTime={item.endTime} color={item.color} />;
+    }
+
     // category에 따라 컴포넌트와 색상 선택
     const getScheduleComponent = (category) => {
       switch (category) {
@@ -74,10 +141,18 @@ const DailySchedule2 = ({ selectedDate }) => {
     );
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>\
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={filteredSchedule}
+        data={completeSchedule}
         renderItem={renderScheduleItem}
         keyExtractor={(item, index) => `${item.category || 'empty'}-${index}`}
         contentContainerStyle={styles.listContainer}
@@ -96,4 +171,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DailySchedule2;
+export default DailySchedule;

@@ -1,5 +1,11 @@
-import React, { useState } from 'react';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
+
+
+
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import axios from 'axios';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
 import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
@@ -26,18 +32,48 @@ const calculateBlockHeight = (startTime, endTime) => {
   return end - start;
 };
 
-const TimeBlockList = ({ tasks, weekDates }) => {
+const TimeBlockList = ({ weekDates }) => {
+  const [tasks, setTasks] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
+  const [loading, setLoading] = useState(true);
 
   const categoryColors = {
-    'meal': colors.scheduleMeal,
-    'hospital': colors.scheduleHospital,
-    'medication': colors.scheduleMeal,
-    'rest': colors.scheduleBreak,
-    'others': colors.scheduleEtc,
-    'myCalendar': colors.gray400,
+    meal: colors.scheduleMeal,
+    hospital: colors.scheduleHospital,
+    medication: colors.scheduleMeal,
+    rest: colors.scheduleBreak,
+    others: colors.scheduleEtc,
+    myCalendar: colors.gray400,
   };
+
+  // API 호출
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/all');
+        const apiTasks = response.data.map((task) => ({
+          id: String(task.id),
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false,
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setTasks(apiTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const handleOpenPopup = (startTime, endTime) => {
     setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
@@ -47,6 +83,14 @@ const TimeBlockList = ({ tasks, weekDates }) => {
   const handleClosePopup = () => {
     setPopupVisible(false); // 팝업 닫기
   };
+
+  if (loading) {
+    return (
+      <View style={styles.timelineContainer}>
+        <Text>Loading tasks...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.timelineContainer}>
@@ -60,7 +104,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
           ]}
         >
           <Text style={styles.timeText}>
-            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}{' '}
+            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}
             {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
           </Text>
         </View>
@@ -112,7 +156,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
                     ]}
                     onPress={() =>
                       handleOpenPopup(previousTask.endTime, task.startTime)
-                    } // 팝업 열기
+                    }
                   >
                     <View style={styles.alertIcon}>
                       <Image source={AlertIcon} style={styles.alertIconImage} />
@@ -167,10 +211,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
         animationType="fade"
         onRequestClose={handleClosePopup}
       >
-        <Popup
-          info={popupInfo}
-          onClose={handleClosePopup}
-        />
+        <Popup info={popupInfo} onClose={handleClosePopup} />
       </Modal>
     </View>
   );
