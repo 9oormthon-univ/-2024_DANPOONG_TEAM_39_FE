@@ -75,8 +75,9 @@ const TimeBlockList = ({ weekDates }) => {
     fetchTasks();
   }, []);
 
-  const handleOpenPopup = (startTime, endTime) => {
-    setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
+  const handleOpenPopup = (time, endTime, date) => {
+    setPopupInfo({ time, endTime, date }); // 팝업에 표시할 정보 설정
+    console.log("위클리팝업ㄴㄴ"+date, time, endTime);
     setPopupVisible(true); // 팝업 열기
   };
 
@@ -155,7 +156,7 @@ const TimeBlockList = ({ weekDates }) => {
                       },
                     ]}
                     onPress={() =>
-                      handleOpenPopup(previousTask.endTime, task.startTime)
+                      handleOpenPopup(previousTask.endTime, task.startTime, task.date)
                     }
                   >
                     <View style={styles.alertIcon}>
@@ -211,7 +212,13 @@ const TimeBlockList = ({ weekDates }) => {
         animationType="fade"
         onRequestClose={handleClosePopup}
       >
-        <Popup info={popupInfo} onClose={handleClosePopup} />
+        <Popup
+            info={popupInfo}
+            onClose={handleClosePopup}
+            time={popupInfo?.time}  // popupInfo에서 time 전달
+            endTime={popupInfo?.endTime}  // popupInfo에서 endTime 전달
+            date={popupInfo?.date}  // popupInfo에서 date 전달
+        />
       </Modal>
     </View>
   );
