@@ -39,10 +39,11 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
     'myCalendar': colors.gray400,
   };
 
-  const handleOpenPopup = (startTime, endTime) => {
-    setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
+  const handleOpenPopup = (date, time, endTime) => {
+    setPopupInfo({date, time, endTime }); // 팝업에 표시할 정보 설정
     setPopupVisible(true); // 팝업 열기
   };
+
 
   const handleClosePopup = () => {
     setPopupVisible(false); // 팝업 닫기
@@ -111,10 +112,10 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
                       },
                     ]}
                     onPress={() =>
-                      handleOpenPopup(previousTask.endTime, task.startTime)
+                        handleOpenPopup(task.date, previousTask.endTime, task.startTime)
                     } // 팝업 열기
                   >
-                    <View style={styles.alertIcon}>
+                    <View style={styles.alertIcon}>s
                       <Image source={AlertIcon} style={styles.alertIconImage} />
                     </View>
                   </TouchableOpacity>
@@ -162,14 +163,17 @@ const TimeBlockList2 = ({ tasks, weekDates }) => {
 
       {/* 팝업 컴포넌트 */}
       <Modal
-        visible={popupVisible}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={handleClosePopup}
+          visible={popupVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={handleClosePopup}
       >
         <Popup
-          info={popupInfo}
-          onClose={handleClosePopup}
+            info={popupInfo}
+            onClose={handleClosePopup}
+            time={popupInfo?.time}  // popupInfo에서 time 전달
+            endTime={popupInfo?.endTime}  // popupInfo에서 endTime 전달
+            date={popupInfo?.date}  // popupInfo에서 date 전달
         />
       </Modal>
     </View>

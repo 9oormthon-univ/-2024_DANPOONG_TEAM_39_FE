@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CategoryPicker from '../components/atoms/CategoryPicker';
@@ -23,7 +23,7 @@ const AddOthersTask = ({ route }) => {
   const navigation = useNavigation();
   const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
   const [name, setName] = useState(route.params?.familyName || '김구름');
-
+  const [taskName, setTaskName] = useState(route.params?.categoryName || ''); // categoryName을 taskName으로 사용
    // 카테고리별 페이지 맵핑
    const categoryRoutes = {
     hospital: 'AddHospitalTask',
@@ -31,8 +31,10 @@ const AddOthersTask = ({ route }) => {
     meal: 'AddMealTask',
     rest: 'AddRestTask',
   };
-
   // 카테고리 선택 처리
+  useEffect(() => {
+    console.log('현재 taskName 값:', taskName);  // taskName 값 확인
+  }, [taskName]);
   const handleCategorySelect = (category) => {
     if (selectedCategory === category) return; // 이미 선택된 카테고리라면 이동하지 않음
     setSelectedCategory(category);
@@ -72,18 +74,35 @@ const AddOthersTask = ({ route }) => {
 
         {/* 일정명 입력 */}
         <View style={styles.component}>
-          <TaskNameInput />
+          <TaskNameInput
+              value={taskName.categoryName} // categoryName 값을 입력란에 표시
+              onValueChange={(text) =>
+                  setTaskName((prev) => ({
+                    ...prev, // 기존 상태 유지
+                    categoryName: text, // categoryName만 업데이트
+                  }))
+              }
+          />
         </View>
-
         {/* 일정 날짜 선택 */}
         <View style={styles.component}>
-          <TaskDatePickerButton defaultText="일정 일자 선택" />
+          <TaskDatePickerButton
+              defaultText={taskName.date || '일정 일자 선택'} // 기본값으로 날짜 표시
+              onDateChange={(selectedDate) =>
+                  setTaskName((prev) => ({
+                    ...prev,
+                    date: selectedDate, // 날짜 업데이트
+                  }))
+              }
+          />
         </View>
+
 
         {/* 시작 시간 ~ 종료 시간 */}
         <View style={styles.component}>
           <StartTimeEndTime />
         </View>
+
 
         {/* 알림 설정 */}
         <View style={styles.component}>
