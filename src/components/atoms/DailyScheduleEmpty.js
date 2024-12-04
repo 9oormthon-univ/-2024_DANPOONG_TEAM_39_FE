@@ -6,7 +6,7 @@ import EmptyIcon from '../../assets/images/daily_empty.svg';
 import NextIcon from '../../assets/images/daily_empty_next.svg';
 import Popup from './Popup'; // Popup.js 가져오기
 
-const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400 }) => {
+const DailyScheduleEmpty = ({ time, endTime, date, color = colors.gray400 }) => {
   const [isPopupVisible, setPopupVisible] = useState(false); // 팝업 상태 관리
 
   const handlePress = () => {
@@ -18,40 +18,45 @@ const DailyScheduleEmpty = ({ time, endTime, color = colors.gray400 }) => {
   };
 
   return (
-    <>
-      <View style={styles.container}>
-        {/* 시작 시간과 점 */}
-        <View style={styles.timeContainer}>
-          <Text style={styles.timeText}>{time}</Text>
-          <View style={[styles.circle, { backgroundColor: color }]} />
-        </View>
-
-        {/* 박스 */}
-        <TouchableOpacity style={styles.box} onPress={handlePress}>
-          {/* 아이콘과 시간 */}
-          <View style={styles.textContainer}>
-            <EmptyIcon width={24} height={24} style={styles.emptyIcon} />
-            <Text style={styles.timeRangeText}>{`${time} ~ ${endTime}`}</Text>
+      <>
+        <View style={styles.container}>
+          {/* 시작 시간과 점 */}
+          <View style={styles.timeContainer}>
+            <Text style={styles.timeText}>{time}</Text>
+            <View style={[styles.circle, { backgroundColor: color }]} />
           </View>
 
-          {/* 공백 발생 텍스트 */}
-          <Text style={styles.emptyText}>돌봄 공백이 발생했어요.</Text>
+          {/* 박스 */}
+          <TouchableOpacity style={styles.box} onPress={handlePress}>
+            {/* 아이콘과 시간 */}
+            <View style={styles.textContainer}>
+              <EmptyIcon width={24} height={24} style={styles.emptyIcon} />
+              <Text style={styles.timeRangeText}>{`${time} ~ ${endTime}`}</Text>
+            </View>
 
-          {/* 오른쪽 아이콘 */}
-          <NextIcon width={24} height={24} style={styles.nextIcon} />
-        </TouchableOpacity>
-      </View>
+            {/* 공백 발생 텍스트 */}
+            <Text style={styles.emptyText}>돌봄 공백이 발생했어요.</Text>
 
-      {/* Popup 표시 */}
-      <Modal
-        transparent={true}
-        visible={isPopupVisible}
-        animationType="fade"
-        onRequestClose={handleClose}
-      >
-        <Popup onClose={handleClose} />
-      </Modal>
-    </>
+            {/* 오른쪽 아이콘 */}
+            <NextIcon width={24} height={24} style={styles.nextIcon} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Popup 표시 */}
+        <Modal
+            transparent={true}
+            visible={isPopupVisible}
+            animationType="fade"
+            onRequestClose={handleClose}
+        >
+          <Popup
+              onClose={handleClose}
+              time={time}  // time 전달
+              endTime={endTime}  // endTime 전달
+              date={date}
+          />
+        </Modal>
+      </>
   );
 };
 
@@ -110,6 +115,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 12,
     top: '50%',
+  },
+  dateText: {
+    ...textStyles.subtitle12Medium14,
+    color: colors.gray800,
+    marginTop: 4,  // Add space between the time and date
   },
 });
 
