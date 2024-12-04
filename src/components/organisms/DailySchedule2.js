@@ -8,7 +8,7 @@ import DailySchedulePill from '../atoms/DailySchedulePill';
 import axios from 'axios';
 import colors from '../../styles/colors'; // 색상 가져오기
 
-const DailySchedule = ({ selectedDate }) => {
+const DailySchedule = ({ selectedDate, selectedProfile }) => {
   const [mockTasks, setMockTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -16,7 +16,8 @@ const DailySchedule = ({ selectedDate }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('http://34.236.139.89:8080/api/calendar/1');
+        console.log(`Fetching tasks for Profile ID: ${selectedProfile.id}`); // 프로필 ID 확인용 로그
+        const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile.id}`);
         const apiTasks = response.data.data.map((task, index) => ({
           id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
           category: task.category || 'others',
@@ -37,8 +38,10 @@ const DailySchedule = ({ selectedDate }) => {
       }
     };
 
-    fetchTasks();
-  }, []);
+    if (selectedProfile?.id) {
+      fetchTasks();
+    }
+  }, [selectedProfile]);
 
   // 선택된 날짜에 해당하는 일정 필터링
   const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
