@@ -9,8 +9,6 @@ import TimeBlockList from '../components/organisms/TimeBlockList';
 import TimeBlockList2 from '../components/organisms/TimeBlockList2'; // 김구름 전용
 import DailySchedule from '../components/organisms/DailySchedule';
 import DailySchedule2 from '../components/organisms/DailySchedule2'; // 김구름 전용
-import MockTasks from '../datas/MockTasks';
-import MockTasks2 from '../datas/MockTasks2'; // 김구름 전용 데이터
 import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
@@ -87,17 +85,17 @@ const HomeScreen = () => {
           {viewMode === 'week' ? (
             <View style={styles.timeblockContainer}>
               {selectedProfile?.name === '김구름' ? (
-                <TimeBlockList2 tasks={MockTasks2} weekDates={weekDates} />
+                <TimeBlockList2 weekDates={weekDates} />
               ) : (
-                <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+                <TimeBlockList weekDates={weekDates} />
               )}
             </View>
           ) : (
             <View style={styles.dailyContent}>
               {selectedProfile?.name === '김구름' ? (
-                <DailySchedule2 tasks={MockTasks2} selectedDate={selectedDate} />
+                <DailySchedule2 selectedDate={selectedDate} />
               ) : (
-                <DailySchedule tasks={MockTasks} selectedDate={selectedDate} /> // 선택된 날짜 전달
+                <DailySchedule selectedDate={selectedDate} /> // 선택된 날짜 전달
               )}
             </View>
           )}
