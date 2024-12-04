@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     justifyContent: 'center',
+    marginBottom: 16,
   },
   codeText: {
     flex: 1,

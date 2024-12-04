@@ -1,18 +1,31 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context'; // iOS 세이프 에리어
+import { useNavigation } from '@react-navigation/native'; // navigation 가져오기
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
+import EnterCaregiverModal from '../components/organisms/EnterCaregiverModal'; // 모달 컴포넌트 임포트
 import colors from '../styles/colors';
 import textStyles from '../styles/textStyles';
 import CareFamilyChevronIcon from '../assets/images/carefamily_chevron.svg';
 
 const AddCareFamily = () => {
-  const navigation = useNavigation();
+  const [isModalVisible, setModalVisible] = useState(false); // 모달 표시 상태 관리
+  const navigation = useNavigation(); // navigation 초기화
 
   // "이미 가족이 있어요" 클릭 핸들러
   const handleAlreadyHaveFamily = () => {
-    navigation.navigate('EnterCaregiverModal'); // EnterCaregiverModal로 이동
+    setModalVisible(true); // 모달 표시
+  };
+
+  // 모달 닫기 핸들러
+  const closeModal = () => {
+    setModalVisible(false); // 모달 닫기
   };
 
   // "돌봄 가족 추가" 클릭 핸들러
@@ -35,10 +48,12 @@ const AddCareFamily = () => {
       {/* 콘텐츠 */}
       <View style={styles.textContent}>
         <Text style={styles.mainText}>
-          가족이 관리해야 하는 {"\n"}<Text style={styles.highlightText}>돌봄 가족의 정보를 입력해요.</Text>
+          가족이 관리해야 하는 {"\n"}
+          <Text style={styles.highlightText}>돌봄 가족의 정보를 입력해요.</Text>
         </Text>
         <Text style={styles.subText}>
-          손길로 관리할 돌봄 일정의 대상이 되는{"\n"}돌봄 가족의 정보를 입력해주세요.
+          손길로 관리할 돌봄 일정의 대상이 되는{"\n"}
+          돌봄 가족의 정보를 입력해주세요.
         </Text>
       </View>
 
@@ -55,6 +70,9 @@ const AddCareFamily = () => {
           <TaskAbledButton text="돌봄 가족 추가" onPress={handleAddFamily} />
         </View>
       </View>
+
+      {/* 모달 */}
+      <EnterCaregiverModal visible={isModalVisible} onClose={closeModal} />
     </SafeAreaView>
   );
 };
