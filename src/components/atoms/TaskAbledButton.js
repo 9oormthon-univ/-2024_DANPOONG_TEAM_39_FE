@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // 중앙 정렬
     alignItems: 'center', // 중앙 정렬
     alignSelf: 'center', // 부모 기준으로 수평 중앙 배치
-    marginVertical: 45, // 위아래 간격 추가
+    marginBottom: 52, // 위아래 간격 추가
   },
   text: {
     color: colors.white000, // 텍스트 색상 (흰색)
