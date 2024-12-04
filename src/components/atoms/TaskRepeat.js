@@ -10,7 +10,11 @@ const TaskRepeat = ({ placeholder = '반복 주기', repeatCycle, onSelectOption
   const maxHeight = useRef(new Animated.Value(0)).current; // 초기 상태는 닫혀 있음
 
   // 동일한 옵션값을 자식 내부에서 관리
-  const repeatOptions = ['매일 반복', '매주 반복', '매월 반복'];
+  const repeatOptions = [
+    { label: '매일 반복', value: 'DAILY' },
+    { label: '매주 반복', value: 'WEEKLY' },
+    { label: '매월 반복', value: 'MONTHLY' },
+  ];
 
   const toggleDropdown = () => {
     Animated.timing(maxHeight, {
@@ -21,51 +25,51 @@ const TaskRepeat = ({ placeholder = '반복 주기', repeatCycle, onSelectOption
   };
 
   const handleSelectOption = (option) => {
-    setSelectedOption(option);
+    setSelectedOption(option); // 선택된 객체를 상태로 설정
     toggleDropdown(); // 선택 후 드롭다운 닫기
-    onSelectOption?.(option); // 선택된 값을 부모로 전달
+    onSelectOption?.(option.value); // 선택된 value 값을 부모로 전달
   };
 
   return (
-    <View>
-      {/* 제목 추가 */}
-      <Text style={styles.title}>일정 반복</Text>
-      <View style={styles.container}>
-        {/* 드롭다운 버튼 */}
-        <TouchableOpacity style={styles.picker} onPress={toggleDropdown}>
-          <View style={styles.buttonContent}>
-            <Text style={styles.selectedText}>
-              {selectedOption || placeholder}
-            </Text>
-            <RepeatIcon width={16} height={16} style={styles.icon} />
-          </View>
-        </TouchableOpacity>
-
-        {/* 드롭다운 목록 */}
-        <Animated.View style={[styles.dropdownContainer, { maxHeight }]}>
-          {repeatOptions.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.dropdownItem,
-                item === selectedOption && styles.selectedItem, // 선택된 항목 강조
-                index === repeatOptions.length - 1 && styles.lastItem, // 마지막 항목 처리
-              ]}
-              onPress={() => handleSelectOption(item)}
-            >
-              <Text
-                style={[
-                  styles.dropdownText,
-                  item === selectedOption && styles.selectedText, // 선택된 텍스트 강조
-                ]}
-              >
-                {item}
+      <View>
+        {/* 제목 추가 */}
+        <Text style={styles.title}>일정 반복</Text>
+        <View style={styles.container}>
+          {/* 드롭다운 버튼 */}
+          <TouchableOpacity style={styles.picker} onPress={toggleDropdown}>
+            <View style={styles.buttonContent}>
+              <Text style={styles.selectedText}>
+                {selectedOption ? selectedOption.label : placeholder}
               </Text>
-            </TouchableOpacity>
-          ))}
-        </Animated.View>
+              <RepeatIcon width={16} height={16} style={styles.icon} />
+            </View>
+          </TouchableOpacity>
+
+          {/* 드롭다운 목록 */}
+          <Animated.View style={[styles.dropdownContainer, { maxHeight }]}>
+            {repeatOptions.map((item, index) => (
+                <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.dropdownItem,
+                      item === selectedOption && styles.selectedItem, // 선택된 항목 강조
+                      index === repeatOptions.length - 1 && styles.lastItem, // 마지막 항목 처리
+                    ]}
+                    onPress={() => handleSelectOption(item)} // 객체를 전달
+                >
+                  <Text
+                      style={[
+                        styles.dropdownText,
+                        item === selectedOption && styles.selectedText, // 선택된 텍스트 강조
+                      ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+            ))}
+          </Animated.View>
+        </View>
       </View>
-    </View>
   );
 };
 
@@ -127,3 +131,4 @@ const styles = StyleSheet.create({
 });
 
 export default TaskRepeat;
+
