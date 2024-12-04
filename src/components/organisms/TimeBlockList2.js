@@ -1,14 +1,11 @@
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs(true);
 
-
-
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, StyleSheet, Modal } from 'react-native';
 import axios from 'axios';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
-import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
 import Popup from '../atoms/Popup'; // Popup 컴포넌트 가져오기
 
 const HOUR_HEIGHT = 60; // 1시간의 높이를 60px로 설정
@@ -116,7 +113,7 @@ const TimeBlockList = ({ weekDates }) => {
           .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
           .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
 
-        return tasksOnDate.map((task, index) => {
+        return tasksOnDate.map((task) => {
           const top = timeToPosition(task.startTime);
           const height = calculateBlockHeight(task.startTime, task.endTime);
 
@@ -131,57 +128,6 @@ const TimeBlockList = ({ weekDates }) => {
           const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
           const backgroundColor = categoryColors[task.category];
-
-          // 공백 계산
-          if (index > 0) {
-            const previousTask = tasksOnDate[index - 1];
-            const prevEnd = timeToPosition(previousTask.endTime);
-            const currentStart = top;
-
-            if (currentStart > prevEnd) {
-              const gapHeight = currentStart - prevEnd;
-
-              return (
-                <React.Fragment key={`gap-${task.id}`}>
-                  {/* 공백 블록 */}
-                  <TouchableOpacity
-                    style={[
-                      styles.alertBlock,
-                      {
-                        top: prevEnd,
-                        height: gapHeight,
-                        left: `${leftPercentage}%`,
-                        width: `${widthPercentage}%`,
-                      },
-                    ]}
-                    onPress={() =>
-                      handleOpenPopup(previousTask.endTime, task.startTime)
-                    }
-                  >
-                    <View style={styles.alertIcon}>
-                      <Image source={AlertIcon} style={styles.alertIconImage} />
-                    </View>
-                  </TouchableOpacity>
-
-                  {/* 현재 Task */}
-                  <View
-                    style={[
-                      styles.block,
-                      {
-                        top,
-                        height,
-                        left: `${leftPercentage}%`,
-                        width: `${widthPercentage}%`,
-                        backgroundColor,
-                      },
-                    ]}
-                  >
-                    <Text style={styles.blockText}>{task.title}</Text>
-                  </View>
-                </React.Fragment>
-              );
-            }
-          }
 
           // Task 블록 렌더링
           return (
@@ -253,25 +199,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     lineHeight: 14,
     fontSize: 12,
-  },
-  alertBlock: {
-    position: 'absolute',
-    backgroundColor: colors.primary003,
-    borderRadius: 8,
-    zIndex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  alertIcon: {
-    position: 'absolute',
-    top: -10,
-    alignSelf: 'center',
-    zIndex: 2,
-  },
-  alertIconImage: {
-    left: -3,
-    width: 50,
-    height: 50,
   },
 });
 
