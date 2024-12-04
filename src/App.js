@@ -8,12 +8,13 @@ import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 
 import AddTasksHeader from './components/templates/AddTasksHeader'; // 커스텀 헤더
-import AddPillTask from './screens/AddPillTask'; 
+import AddPillTask from './screens/AddPillTask';
 import AddMealTask from './screens/AddMealTask';
-import AddHospitalTask from './screens/AddHospitalTask'; 
-import AddRestTask from './screens/AddRestTask'; 
-import AddOthersTask from './screens/AddOthersTask'; 
+import AddHospitalTask from './screens/AddHospitalTask';
+import AddRestTask from './screens/AddRestTask';
+import AddOthersTask from './screens/AddOthersTask';
 import AddMyCalendar from './screens/AddMyCalendar';
+import AddCaregiverRestTask from "./screens/AddCaregiverRestTask";
 enableScreens(); // react-native-screens 초기화
 
 const Stack = createStackNavigator();
@@ -29,54 +30,62 @@ export default function App() {
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }} />
 
         {/* 일정 추가 화면 */}
-        <Stack.Screen 
-          name="AddPillTask" 
+        <Stack.Screen
+          name="AddPillTask"
           component={AddPillTask}
           options={{
-            header: () => <AddTasksHeader />, 
+            header: () => <AddTasksHeader />,
             presentation: 'modal',
-          }} 
+          }}
         />
-        <Stack.Screen 
-          name="AddMealTask" 
-          component={AddMealTask} 
-          options={{
-            header: () => <AddTasksHeader />, 
-            presentation: 'modal', 
-          }} 
-        />
-        <Stack.Screen 
-          name="AddHospitalTask" 
-          component={AddHospitalTask} 
-          options={{
-            header: () => <AddTasksHeader />, 
-            presentation: 'modal', 
-          }} 
-        />
-        <Stack.Screen 
-          name="AddRestTask" 
-          component={AddRestTask} 
+        <Stack.Screen
+          name="AddMealTask"
+          component={AddMealTask}
           options={{
             header: () => <AddTasksHeader />,
-            presentation: 'modal', 
-          }} 
+            presentation: 'modal',
+          }}
         />
-        <Stack.Screen 
-          name="AddOthersTask" 
-          component={AddOthersTask} 
+        <Stack.Screen
+          name="AddHospitalTask"
+          component={AddHospitalTask}
           options={{
-            header: () => <AddTasksHeader />, 
-            presentation: 'modal', 
-          }} 
+            header: () => <AddTasksHeader />,
+            presentation: 'modal',
+          }}
         />
-        <Stack.Screen 
-          name="AddMyCalendar" 
-          component={AddMyCalendar} 
+        <Stack.Screen
+          name="AddRestTask"
+          component={AddRestTask}
           options={{
-            header: () => <AddTasksHeader />, 
-            presentation: 'modal', 
-          }} 
+            header: () => <AddTasksHeader />,
+            presentation: 'modal',
+          }}
         />
+        <Stack.Screen
+          name="AddOthersTask"
+          component={AddOthersTask}
+          options={{
+            header: () => <AddTasksHeader />,
+            presentation: 'modal',
+          }}
+        />
+        <Stack.Screen
+          name="AddMyCalendar"
+          component={AddMyCalendar}
+          options={{
+            header: () => <AddTasksHeader />,
+            presentation: 'modal',
+          }}
+        />
+          <Stack.Screen
+              name="AddCaregiverRestTask"
+              component={AddCaregiverRestTask}
+              options={{
+                  header: () => <AddTasksHeader />,
+                  presentation: 'modal',
+              }}
+          />
       </Stack.Navigator>
     </NavigationContainer>
   );

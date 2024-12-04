@@ -68,6 +68,7 @@ const DailySchedule = ({ selectedDate }) => {
             startTime: sortedSchedule[i].endTime,
             endTime: sortedSchedule[i + 1].startTime,
             color: colors.gray200,
+            date: sortedSchedule[i].date,
           });
         }
       }
@@ -81,7 +82,7 @@ const DailySchedule = ({ selectedDate }) => {
   const renderScheduleItem = ({ item }) => {
     // 공백 블록 렌더링
     if (item.type === 'empty') {
-      return <DailyScheduleEmpty time={item.startTime} endTime={item.endTime} color={item.color} />;
+      return <DailyScheduleEmpty time={item.startTime} endTime={item.endTime} color={item.color} date={item.date} />;
     }
 
     // category에 따라 컴포넌트와 색상 선택
