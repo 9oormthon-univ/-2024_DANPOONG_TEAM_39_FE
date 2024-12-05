@@ -29,7 +29,7 @@ const calculateBlockHeight = (startTime, endTime) => {
   return end - start;
 };
 
-const TimeBlockList = ({ weekDates }) => {
+const TimeBlockList = ({ weekDates, selectedProfile }) => {
   const [tasks, setTasks] = useState([]);
   const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
@@ -44,20 +44,28 @@ const TimeBlockList = ({ weekDates }) => {
     myCalendar: colors.gray400,
   };
 
+  // 선택된 프로필 ID를 출력
+  useEffect(() => {
+    if (selectedProfile) {
+      console.log(`Selected Profile ID: ${selectedProfile.id}`); // 선택한 프로필 ID 출력
+    }
+  }, [selectedProfile]);
+
   // API 호출
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('http://34.236.139.89:8080/api/calendar/1');
+        console.log(`Fetching tasks for Profile ID: ${selectedProfile.id}`); // 콘솔에 추가 로그 출력
+        const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile?.id}`);
         const apiTasks = response.data.data.map((task, index) => ({
-          id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
+          id: String(index + 1),
           category: task.category || 'others',
           title: task.title || 'No Title',
           date: task.date || '2024-12-01',
           startTime: task.startTime.slice(0, 5) || '00:00',
           endTime: task.endTime.slice(0, 5) || '00:00',
           isAlarm: task.isAlarm || false,
-          hasRecommendation: task.hasRecommendation || false, // API에 없는 경우 기본값 설정
+          hasRecommendation: task.hasRecommendation || false,
           isShared: task.isShared || false,
           location: task.location || 'No Location',
         }));
@@ -69,8 +77,10 @@ const TimeBlockList = ({ weekDates }) => {
       }
     };
 
-    fetchTasks();
-  }, []);
+    if (selectedProfile) {
+      fetchTasks();
+    }
+  }, [selectedProfile]);
 
   const handleOpenPopup = (startTime, endTime) => {
     setPopupInfo({ startTime, endTime }); // 팝업에 표시할 정보 설정
