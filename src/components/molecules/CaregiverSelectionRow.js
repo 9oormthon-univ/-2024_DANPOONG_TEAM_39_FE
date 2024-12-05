@@ -46,8 +46,8 @@ const CaregiverSelectionRow = ({
               styles.profileContainer,
               selectedProfile === item.id && styles.selectedProfile, // 선택된 프로필 강조
             ]}
-            onPress={() => !isCaregiverNotNeeded && onProfileSelect(item.id)}
-            disabled={isCaregiverNotNeeded} // 필요하지 않음 체크 시 비활성화
+            onPress={() => !isCaregiverNotNeeded && item.available && onProfileSelect(item.id)} // available이 true일 때만 onPress 실행
+            disabled={isCaregiverNotNeeded || !item.available} // available이 false이면 비활성화
           >
             <View
               style={[
@@ -63,7 +63,7 @@ const CaregiverSelectionRow = ({
             <Text
               style={[
                 styles.profileName,
-                isCaregiverNotNeeded && { color: colors.gray400 }, // 필요하지 않음 체크 시 색상 변경
+                (isCaregiverNotNeeded || !item.available) && { color: colors.gray400 }, // available이 false일 때 이름 색상 변경, // 필요하지 않음 체크 시 색상 변경
               ]}
             >
               {item.member?.alias || '이름 없음'}
@@ -90,15 +90,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  requiredMarker: { 
-    fontSize: 16, 
-    fontFamily: fonts.semiBold, 
-    color: colors.primary001, 
+  requiredMarker: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
+    color: colors.primary001,
     marginRight: 4,
   },
-  label: { 
-    fontSize: 16, 
-    fontFamily: fonts.semiBold, 
+  label: {
+    fontSize: 16,
+    fontFamily: fonts.semiBold,
     color: colors.gray800,
   },
   checkBoxRow: {

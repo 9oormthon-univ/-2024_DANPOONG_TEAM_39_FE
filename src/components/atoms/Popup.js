@@ -265,14 +265,14 @@ const styles = StyleSheet.create({
   floatText: {
     position: 'absolute',
     bottom: 60,
-    right: 107,
+    right: 96,
     ...textStyles.title16SemiBold,
     color: colors.primary001,
   },
   floatText1: {
     position: 'absolute',
     bottom: 40,
-    right: 107,
+    right: 96,
     ...textStyles.title16SemiBold,
     color: colors.white000,
   },
