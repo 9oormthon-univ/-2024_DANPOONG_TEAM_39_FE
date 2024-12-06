@@ -1,8 +1,6 @@
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs(true);
 
-
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, FlatList, View, Text } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
