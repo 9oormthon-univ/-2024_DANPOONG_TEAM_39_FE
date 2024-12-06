@@ -41,9 +41,10 @@ const FamilyList = ({ onSelectProfile }) => {
         console.error('Error fetching profiles:', error);
       }
     };
-
+  
     fetchProfiles();
   }, []);
+  
 
   // 앱 실행 시 기본 프로필 선택
   useEffect(() => {
@@ -106,7 +107,7 @@ const FamilyList = ({ onSelectProfile }) => {
       >
         {profiles.slice(1).map((profile) => (
           <TouchableOpacity
-            key={profile.id}
+            key={profile.id} // id를 고유 key로 사용
             style={[
               styles.profileButton,
               selectedProfile === profile.id && styles.selectedProfile,
