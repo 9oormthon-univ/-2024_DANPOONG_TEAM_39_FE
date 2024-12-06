@@ -10,9 +10,6 @@ import TimeBlockList from '../components/organisms/TimeBlockList';
 import TimeBlockList2 from '../components/organisms/TimeBlockList2'; // 김구름 전용
 import DailySchedule from '../components/organisms/DailySchedule';
 import DailySchedule2 from '../components/organisms/DailySchedule2'; // 김구름 전용
-import MockTasks from '../datas/MockTasks';
-import MockTasks2 from '../datas/MockTasks2'; // 김구름 전용 데이터
-import Profiles from '../datas/Profiles';
 import FloatingButton from '../components/atoms/FloatingButton';
 import moment from 'moment';
 import 'moment/locale/ko';
@@ -69,7 +66,7 @@ const HomeScreen = ({ navigation }) => {
           { height: familyListHeight, opacity: familyListOpacity },
         ]}
       >
-        <FamilyList Profiles={Profiles} onSelectProfile={setSelectedProfile} />
+        <FamilyList onSelectProfile={setSelectedProfile} />
       </Animated.View>
 
       {/* CalendarDatepicker + WeekDays 컴포넌트 */}
@@ -100,18 +97,18 @@ const HomeScreen = ({ navigation }) => {
           {/* 선택된 프로필에 따라 다른 컴포넌트 렌더링 */}
           {viewMode === 'week' ? (
             <View style={styles.timeblockContainer}>
-              {selectedProfile?.name === '김구름' ? (
-                <TimeBlockList2 tasks={MockTasks2} weekDates={weekDates} />
-              ) : (
-                <TimeBlockList tasks={MockTasks} weekDates={weekDates} />
+              {selectedProfile?.id === 0 ? ( // id가 0일 때
+                <TimeBlockList weekDates={weekDates} selectedProfile={selectedProfile} /> // 선택한 프로필 전달
+              ) : ( // id가 0이 아닐 때
+                <TimeBlockList2 weekDates={weekDates} selectedProfile={selectedProfile} /> // 선택한 프로필 전달
               )}
             </View>
           ) : (
             <View style={styles.dailyContent}>
-              {selectedProfile?.name === '김구름' ? (
-                <DailySchedule2 tasks={MockTasks2} selectedDate={selectedDate} />
-              ) : (
-                <DailySchedule tasks={MockTasks} selectedDate={selectedDate} /> // 선택된 날짜 전달
+              {selectedProfile?.id === 0 ? ( // id가 0일 때
+                <DailySchedule selectedDate={selectedDate} selectedProfile={selectedProfile} /> // 선택한 프로필 전달
+              ) : ( // id가 0이 아닐 때
+                <DailySchedule2 selectedDate={selectedDate} selectedProfile={selectedProfile} /> // 선택한 프로필 전달
               )}
             </View>
           )}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'; // Feather 라이브러리 사용
 import HandHeartIcon from '../../assets/images/hand_heart.svg';
@@ -7,17 +7,35 @@ import colors from '../../styles/colors';
 import InviteCaregiverModal from './InviteCaregiverModal'; // 초대 모달 컴포넌트 가져오기
 import textStyles from '../../styles/textStyles';
 
-const FamilyList = ({ Profiles, onSelectProfile }) => {
+const FamilyList = ({ onSelectProfile }) => {
+  const [profiles, setProfiles] = useState([
+    { id: 0, name: '할머니', imagePath: require('../../assets/images/profile.png') },
+  ]); // 초기 프로필
   const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필 상태
   const [isInviteModalVisible, setInviteModalVisible] = useState(false); // 모달 상태 관리
 
-  if (!Profiles || Profiles.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>프로필 정보가 없습니다.</Text>
-      </View>
-    );
-  }
+  // API에서 프로필 데이터 가져오기
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const response = await fetch('http://34.236.139.89:8080/api/careCalendar/dolbomiList');
+        const data = await response.json();
+
+        // 기존 프로필에 API 데이터를 추가
+        const newProfiles = data.map((profile) => ({
+          id: profile.id,
+          name: profile.member.alias || 'Unknown',
+          imagePath: require('../../assets/images/profile_me.png'), // 고정 이미지 경로
+        }));
+
+        setProfiles((prevProfiles) => [...prevProfiles, ...newProfiles]);
+      } catch (error) {
+        console.error('Error fetching profiles:', error);
+      }
+    };
+
+    fetchProfiles();
+  }, []);
 
   const handleProfileSelect = (profile) => {
     setSelectedProfile(profile.id); // 선택된 프로필 상태 업데이트
@@ -32,26 +50,34 @@ const FamilyList = ({ Profiles, onSelectProfile }) => {
     setInviteModalVisible(false); // 초대 모달 닫기
   };
 
+  if (!profiles || profiles.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>프로필 정보가 없습니다.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* 첫 번째 프로필을 고정 */}
       <TouchableOpacity
         style={[
           styles.profileButton,
-          selectedProfile === Profiles[0].id && styles.selectedProfile, // 선택된 프로필 스타일 적용
+          selectedProfile === profiles[0].id && styles.selectedProfile, // 선택된 프로필 스타일 적용
         ]}
-        onPress={() => handleProfileSelect(Profiles[0])} // 첫 번째 프로필 클릭
+        onPress={() => handleProfileSelect(profiles[0])} // 첫 번째 프로필 클릭
       >
         <View
           style={[
             styles.imageWrapper,
-            selectedProfile === Profiles[0].id && styles.selectedImageWrapper,
+            selectedProfile === profiles[0].id && styles.selectedImageWrapper,
           ]}
         >
-          <Image source={Profiles[0].imagePath} style={styles.image} />
+          <Image source={profiles[0].imagePath} style={styles.image} />
         </View>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>{Profiles[0].name}</Text>
+          <Text style={styles.text}>{profiles[0].name}</Text>
           <HandHeartIcon style={styles.icon} />
         </View>
       </TouchableOpacity>
@@ -62,7 +88,7 @@ const FamilyList = ({ Profiles, onSelectProfile }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       >
-        {Profiles.slice(1).map((profile) => (
+        {profiles.slice(1).map((profile) => (
           <TouchableOpacity
             key={profile.id}
             style={[
@@ -121,7 +147,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 12,
-    
   },
   addButton: {
     width: 58,
@@ -132,7 +157,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary004, // 원형 버튼 색상
   },
   inviteText: {
-    
     marginTop: 8,
     fontSize: 14,
     lineHeight: 21,

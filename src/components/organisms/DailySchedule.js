@@ -1,21 +1,50 @@
 import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
 
-// 특정 경고 메시지 무시
-LogBox.ignoreLogs([
-  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
-]);
 
-import React from 'react';
-import { StyleSheet, FlatList, View } from 'react-native';
+
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, FlatList, View, Text } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
 import DailyScheduleEmpty from '../atoms/DailyScheduleEmpty';
 import DailySchedulePill from '../atoms/DailySchedulePill';
-import MockTasks from '../../datas/MockTasks'; // Mock 데이터 가져오기
+import axios from 'axios';
 import colors from '../../styles/colors'; // 색상 가져오기
 
 const DailySchedule = ({ selectedDate }) => {
+  const [mockTasks, setMockTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // API에서 데이터 가져오기
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/all');
+        const tasks = response.data.map((task) => ({
+          id: String(task.id),
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false,
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setMockTasks(tasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
   // 선택된 날짜에 해당하는 일정 필터링
-  const filteredSchedule = MockTasks.filter((task) => task.date === selectedDate);
+  const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
 
   // 공백 시간을 계산하고 공백 블록 추가
   const calculateEmptyBlocks = (schedule) => {
@@ -39,6 +68,7 @@ const DailySchedule = ({ selectedDate }) => {
             startTime: sortedSchedule[i].endTime,
             endTime: sortedSchedule[i + 1].startTime,
             color: colors.gray200,
+            date: sortedSchedule[i].date,
           });
         }
       }
@@ -52,7 +82,7 @@ const DailySchedule = ({ selectedDate }) => {
   const renderScheduleItem = ({ item }) => {
     // 공백 블록 렌더링
     if (item.type === 'empty') {
-      return <DailyScheduleEmpty time={item.startTime} endTime={item.endTime} color={item.color} />;
+      return <DailyScheduleEmpty time={item.startTime} endTime={item.endTime} color={item.color} date={item.date} />;
     }
 
     // category에 따라 컴포넌트와 색상 선택
@@ -111,6 +141,14 @@ const DailySchedule = ({ selectedDate }) => {
       />
     );
   };
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>\
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
