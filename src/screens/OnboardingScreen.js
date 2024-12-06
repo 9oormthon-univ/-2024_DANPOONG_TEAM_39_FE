@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import KakaologinButton from '../components/atoms/KakaologinButton';
 import colors from '../styles/colors';
 import textStyles from '../styles/textStyles';
+import { KAKAO_CLIENT_ID, KAKAO_REDIRECT_URI } from '@env'; // 환경 변수에서 가져오기
+import 'react-native-url-polyfill/auto';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -30,86 +32,112 @@ const slides = [
 
 const OnboardingScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showWebView, setShowWebView] = useState(false); // WebView 표시 상태
   const scrollX = useRef(new Animated.Value(0)).current;
 
-  const Indicator = () => {
-    return (
-      <View style={styles.paginationContainer}>
-        {slides.map((_, index) => {
-          const width = scrollX.interpolate({
-            inputRange: [
-              (index - 1) * screenWidth,
-              index * screenWidth,
-              (index + 1) * screenWidth,
-            ],
-            outputRange: [8, 24, 8],
-            extrapolate: 'clamp',
-          });
+  // 카카오 로그인 URL 생성
+  const KAKAO_AUTH_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_CLIENT_ID}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
 
-          const backgroundColor = scrollX.interpolate({
-            inputRange: [
-              (index - 1) * screenWidth,
-              index * screenWidth,
-              (index + 1) * screenWidth,
-            ],
-            outputRange: [colors.gray200, colors.primary001, colors.gray200],
-            extrapolate: 'clamp',
-          });
+  // WebView 네비게이션 상태 변경 처리
+  const handleNavigationStateChange = (navState) => {
+    if (navState.url.startsWith(KAKAO_REDIRECT_URI)) {
+      const params = new URL(navState.url).searchParams;
+      const code = params.get('code'); // 인증 코드 추출
 
-          return (
-            <Animated.View
-              key={index}
-              style={[styles.dot, { width, backgroundColor }]}
-            />
-          );
-        })}
-      </View>
-    );
+      if (code) {
+        setShowWebView(false); // WebView 닫기
+        // 인증 코드를 홈 화면으로 전달
+        navigation.replace('AddCareFamily', { code });
+      }
+    }
   };
+
+  const Indicator = () => (
+    <View style={styles.paginationContainer}>
+      {slides.map((_, index) => {
+        const width = scrollX.interpolate({
+          inputRange: [
+            (index - 1) * screenWidth,
+            index * screenWidth,
+            (index + 1) * screenWidth,
+          ],
+          outputRange: [8, 24, 8],
+          extrapolate: 'clamp',
+        });
+
+        const backgroundColor = scrollX.interpolate({
+          inputRange: [
+            (index - 1) * screenWidth,
+            index * screenWidth,
+            (index + 1) * screenWidth,
+          ],
+          outputRange: [colors.gray200, colors.primary001, colors.gray200],
+          extrapolate: 'clamp',
+        });
+
+        return (
+          <Animated.View
+            key={index}
+            style={[styles.dot, { width, backgroundColor }]}
+          />
+        );
+      })}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <FlatList
-          data={slides}
-          keyExtractor={(_, index) => index.toString()}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onScroll={Animated.event(
-            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-            { useNativeDriver: false }
-          )}
-          onMomentumScrollEnd={(e) => {
-            const newIndex = Math.round(
-              e.nativeEvent.contentOffset.x / screenWidth
-            );
-            setCurrentIndex(newIndex);
-          }}
-          renderItem={({ item }) => (
-            <View style={styles.slide}>
-              {/* 이미지 */}
-              <WebView
-                source={{ uri: item.animation }}
-                style={styles.webview}
-                javaScriptEnabled
-                domStorageEnabled
-                scalesPageToFit
-                originWhitelist={['*']}
-              />
-              {/* 텍스트 */}
-              <Text style={styles.text}>{item.text}</Text>
-            </View>
-          )}
+      {showWebView ? (
+        <WebView
+          source={{ uri: KAKAO_AUTH_URL }} // 카카오 로그인 URL
+          onNavigationStateChange={handleNavigationStateChange}
+          style={{ flex: 1 }}
         />
-        {/* 페이지네이션 */}
-        <Indicator />
-      </View>
+      ) : (
+        <>
+          <View style={styles.content}>
+            <FlatList
+              data={slides}
+              keyExtractor={(_, index) => index.toString()}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+                { useNativeDriver: false }
+              )}
+              onMomentumScrollEnd={(e) => {
+                const newIndex = Math.round(
+                  e.nativeEvent.contentOffset.x / screenWidth
+                );
+                setCurrentIndex(newIndex);
+              }}
+              renderItem={({ item }) => (
+                <View style={styles.slide}>
+                  <WebView
+                    source={{ uri: item.animation }}
+                    style={styles.webview}
+                    javaScriptEnabled
+                    domStorageEnabled
+                    scalesPageToFit
+                    originWhitelist={['*']}
+                  />
+                  <Text style={styles.text}>{item.text}</Text>
+                </View>
+              )}
+            />
+            <Indicator />
+          </View>
 
-      {/* 로그인 버튼 */}
-      <View style={styles.loginButtonContainer}>
-        <KakaologinButton text="카카오 로그인" />
-      </View>
+          {/* 로그인 버튼 */}
+          <View style={styles.loginButtonContainer}>
+            <KakaologinButton
+              onPress={() => setShowWebView(true)} // WebView 열기
+              text="카카오 로그인"
+            />
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 };
