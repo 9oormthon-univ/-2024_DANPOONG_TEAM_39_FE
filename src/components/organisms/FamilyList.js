@@ -11,7 +11,7 @@ const FamilyList = ({ onSelectProfile }) => {
   const [profiles, setProfiles] = useState([
     { id: 0, name: '할머니', imagePath: require('../../assets/images/profile.png') },
   ]);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [selectedProfile, setSelectedProfile] = useState(0); // 초기값을 '할머니'의 id로 설정
   const [isInviteModalVisible, setInviteModalVisible] = useState(false);
 
   // API에서 프로필 데이터 가져오기
@@ -20,20 +20,20 @@ const FamilyList = ({ onSelectProfile }) => {
       try {
         const response = await fetch('http://34.236.139.89:8080/api/careCalendar/dolbomiList');
         const data = await response.json();
-  
+
         // API 데이터를 기반으로 프로필 생성
         const newProfiles = data.map((profile) => ({
           id: profile.id,
-          name: profile.member.alias || 'Unknown', // alias 또는 Unknown 표시
-          imagePath: require('../../assets/images/profile_me.png'), // 고정된 이미지
+          name: profile.member.alias || 'Unknown',
+          imagePath: require('../../assets/images/profile_me.png'),
         }));
-  
+
         // 기존 프로필과 병합하되, 중복 제거
         setProfiles((prevProfiles) => {
           const allProfiles = [...prevProfiles, ...newProfiles];
           const uniqueProfiles = allProfiles.filter(
             (profile, index, self) =>
-              index === self.findIndex((p) => p.id === profile.id) // id 기준 중복 제거
+              index === self.findIndex((p) => p.id === profile.id) // 중복 제거
           );
           return uniqueProfiles;
         });
@@ -41,10 +41,17 @@ const FamilyList = ({ onSelectProfile }) => {
         console.error('Error fetching profiles:', error);
       }
     };
-  
+
     fetchProfiles();
   }, []);
-  
+
+  // 앱 실행 시 기본 프로필 선택
+  useEffect(() => {
+    const initialProfile = profiles.find((profile) => profile.id === selectedProfile);
+    if (initialProfile) {
+      onSelectProfile(initialProfile);
+    }
+  }, [profiles]); // profiles가 업데이트될 때 실행
 
   const handleProfileSelect = (profile) => {
     setSelectedProfile(profile.id);
@@ -99,7 +106,7 @@ const FamilyList = ({ onSelectProfile }) => {
       >
         {profiles.slice(1).map((profile) => (
           <TouchableOpacity
-            key={profile.id} // id를 고유 key로 사용
+            key={profile.id}
             style={[
               styles.profileButton,
               selectedProfile === profile.id && styles.selectedProfile,
