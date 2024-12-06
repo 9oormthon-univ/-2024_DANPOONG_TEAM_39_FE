@@ -12,6 +12,12 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
   const [mockTasks, setMockTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const eventTypeColors = {
+    공부: '#9CBA90',
+    약속: '#7CC1C7',
+    집안일: '#84929B',
+  };
+
   // API에서 데이터 가져오기
   useEffect(() => {
     const fetchTasks = async () => {
@@ -20,7 +26,8 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
         const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile.id}`);
         const apiTasks = response.data.data.map((task, index) => ({
           id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
-          category: task.category || 'others',
+          category: task.category || null,
+          eventType: task.eventType || 'others',
           title: task.title || 'No Title',
           date: task.date || '2024-12-01',
           startTime: task.startTime.slice(0, 5) || '00:00',
@@ -47,8 +54,16 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
   const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
 
   const renderScheduleItem = ({ item }) => {
-    // category에 따라 컴포넌트와 색상 선택
-    const getScheduleComponent = (category) => {
+    // category 및 eventType에 따라 컴포넌트와 색상 선택
+    const getScheduleComponent = (category, eventType) => {
+      if (!category) {
+        const eventTypeColor = eventTypeColors[eventType];
+        return {
+          Component: DailyScheduleDefault,
+          color: eventTypeColor || colors.gray400,
+        };
+      }
+
       switch (category) {
         case 'meal':
           return {
@@ -88,7 +103,7 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
       }
     };
 
-    const { Component, color } = getScheduleComponent(item.category);
+    const { Component, color } = getScheduleComponent(item.category, item.eventType);
 
     // 일정 컴포넌트 렌더링
     return (

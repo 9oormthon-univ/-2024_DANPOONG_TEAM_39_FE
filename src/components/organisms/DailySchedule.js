@@ -143,7 +143,7 @@ const DailySchedule = ({ selectedDate }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>\
+        <Text></Text>\
       </View>
     );
   }

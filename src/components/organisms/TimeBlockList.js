@@ -88,7 +88,7 @@ const TimeBlockList = ({ weekDates }) => {
   if (loading) {
     return (
       <View style={styles.timelineContainer}>
-        <Text>Loading tasks...</Text>
+        <Text></Text>
       </View>
     );
   }
