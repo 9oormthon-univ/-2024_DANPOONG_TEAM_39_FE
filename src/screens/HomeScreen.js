@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Animated, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Header from '../components/templates/Header';
+import SideBar from '../components/templates/SideBar';
 import FamilyList from '../components/organisms/FamilyList';
 import CalendarDatepicker from '../components/molecules/CalendarDatepicker';
 import WeekDays from '../components/organisms/WeekDays';
@@ -19,8 +20,14 @@ import colors from '../styles/colors';
 
 moment.locale('ko');
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  const [isSidebarVisible, setSidebarVisible] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarVisible(!isSidebarVisible);
+  };
 
   // 주 상태 관리
   const [currentWeek, setCurrentWeek] = useState(moment().startOf('week')); // 현재 주의 시작일
@@ -46,7 +53,14 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.primary001 }}>
-      <Header />
+      
+      {/* 헤더 */}
+      <Header onMenuPress={toggleSidebar} />
+
+      {/* 사이드바 (오버레이로 화면 위에 렌더링) */}
+      {isSidebarVisible && (   
+          <SideBar visible={isSidebarVisible} onClose={toggleSidebar} navigation={navigation} />
+      )}
 
       {/* FamilyList 컴포넌트 */}
       <Animated.View
