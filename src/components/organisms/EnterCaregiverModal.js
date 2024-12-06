@@ -6,21 +6,24 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // React Navigation 훅 가져오기
 import colors from '../../styles/colors';
-import textStyles from '../../styles/textStyles'; // 폰트 스타일 가져오기
-import CloseIcon from '../../assets/images/modal_close.svg'; // 닫기 아이콘
+import textStyles from '../../styles/textStyles';
+import CloseIcon from '../../assets/images/modal_close.svg';
 
-const InviteCaregiverModal = ({ visible, onClose }) => {
+const EnterCaregiverModal = ({ visible, onClose }) => {
   const [inviteCode, setInviteCode] = useState(''); // 초대 코드 상태 관리
+  const navigation = useNavigation(); // 네비게이션 객체 가져오기
 
   const handleConfirm = () => {
     if (inviteCode.length === 6) {
-      Alert.alert('초대 코드 확인', `입력된 초대 코드: ${inviteCode}`);
+      // 초대 코드가 6자리일 때만 동작
       onClose(); // 모달 닫기
+      navigation.navigate('HomeScreen'); // 홈 화면으로 이동
     } else {
-      Alert.alert('오류', '6자리 초대 코드를 입력해주세요.');
+      // Alert 제거: 잘못된 입력 시 아무 동작도 하지 않음
+      console.log('초대 코드는 6자리여야 합니다.');
     }
   };
 
@@ -108,7 +111,6 @@ const styles = StyleSheet.create({
   },
   contentSection: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
     backgroundColor: colors.gray050,
     justifyContent: 'center',
     alignItems: 'center',
@@ -141,4 +143,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InviteCaregiverModal;
+export default EnterCaregiverModal;
