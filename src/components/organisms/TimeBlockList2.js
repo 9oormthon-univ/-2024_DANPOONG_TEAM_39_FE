@@ -46,7 +46,7 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
   };
 
   const eventTypeColors = {
-    공부: '#9CBA90',
+    수업: '#9CBA90',
     약속: '#7CC1C7',
     집안일: '#84929B',
   };
@@ -146,9 +146,9 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
           const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
           // 색상 결정
-          const backgroundColor = task.category
-            ? categoryColors[task.category] || colors.gray400
-            : eventTypeColors[task.eventType] || colors.gray400;
+          const backgroundColor = task.category === 'myCalendar'
+            ? eventTypeColors[task.eventType] || colors.gray400 // eventType에 따라 색상 결정
+            : categoryColors[task.category] || colors.gray400; // 기본 category 색상
 
           return (
             <View
