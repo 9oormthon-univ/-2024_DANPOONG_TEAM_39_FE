@@ -22,9 +22,9 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        console.log(`Fetching tasks for Profile ID: ${selectedProfile.id}`); // 프로필 ID 확인용 로그
+        console.log(`Fetching tasks for Profile ID: ${selectedProfile.id}`);
         const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile.id}`);
-        console.log('API Response Data:', response.data); // API 응답 데이터 출력
+        console.log('API Response Data:', response.data);
         const apiTasks = response.data.data.map((task, index) => ({
           id: String(index + 1),
           category: task.category || null,
@@ -51,8 +51,17 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
     }
   }, [selectedProfile]);
 
-  // 선택된 날짜에 해당하는 일정 필터링
-  const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
+  // 선택된 날짜에 해당하는 일정 필터링 및 시간순 정렬
+  const filteredSchedule = mockTasks
+    .filter((task) => task.date === selectedDate)
+    .sort((a, b) => {
+      // 시간을 분 단위로 변환하여 비교
+      const timeToMinutes = (time) => {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+      };
+      return timeToMinutes(a.startTime) - timeToMinutes(b.startTime);
+    });
 
   const renderScheduleItem = ({ item }) => {
     // category 및 eventType에 따라 컴포넌트와 색상 선택
@@ -94,7 +103,7 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
         default:
           return {
             Component: DailyScheduleDefault,
-            color: colors.gray400, // 기본 색상
+            color: colors.gray400,
           };
       }
     };
@@ -107,9 +116,9 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
         time={item.startTime}
         title={item.title}
         location={item.location}
-        isAlarm={item.isAlarm} // MockTasks에서 가져온 값 적용
-        hasRecommendation={item.hasRecommendation} // MockTasks에서 가져온 값 적용
-        isShared={item.isShared} // MockTasks에서 가져온 값 적용
+        isAlarm={item.isAlarm}
+        hasRecommendation={item.hasRecommendation}
+        isShared={item.isShared}
         color={color}
       />
     );
