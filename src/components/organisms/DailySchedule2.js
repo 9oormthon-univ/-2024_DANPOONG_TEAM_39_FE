@@ -12,21 +12,29 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
   const [mockTasks, setMockTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const eventTypeColors = {
+    수업: '#9CBA90',
+    약속: '#7CC1C7',
+    집안일: '#84929B',
+  };
+
   // API에서 데이터 가져오기
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         console.log(`Fetching tasks for Profile ID: ${selectedProfile.id}`); // 프로필 ID 확인용 로그
         const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile.id}`);
+        console.log('API Response Data:', response.data); // API 응답 데이터 출력
         const apiTasks = response.data.data.map((task, index) => ({
-          id: String(index + 1), // ID가 없으므로 index를 기반으로 생성
-          category: task.category || 'others',
+          id: String(index + 1),
+          category: task.category || null,
+          eventType: task.eventType || null,
           title: task.title || 'No Title',
           date: task.date || '2024-12-01',
           startTime: task.startTime.slice(0, 5) || '00:00',
           endTime: task.endTime.slice(0, 5) || '00:00',
           isAlarm: task.isAlarm || false,
-          hasRecommendation: task.hasRecommendation || false, // API에 없는 경우 기본값 설정
+          hasRecommendation: task.hasRecommendation || false,
           isShared: task.isShared || false,
           location: task.location || 'No Location',
         }));
@@ -47,8 +55,16 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
   const filteredSchedule = mockTasks.filter((task) => task.date === selectedDate);
 
   const renderScheduleItem = ({ item }) => {
-    // category에 따라 컴포넌트와 색상 선택
-    const getScheduleComponent = (category) => {
+    // category 및 eventType에 따라 컴포넌트와 색상 선택
+    const getScheduleComponent = (category, eventType) => {
+      if (category === 'myCalendar') {
+        const eventTypeColor = eventTypeColors[eventType];
+        return {
+          Component: DailyScheduleDefault,
+          color: eventTypeColor || colors.gray400, // eventType이 없거나 매칭되지 않는 경우 기본 색상
+        };
+      }
+
       switch (category) {
         case 'meal':
           return {
@@ -75,11 +91,6 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
             Component: DailyScheduleDefault,
             color: colors.scheduleEtc,
           };
-        case 'myCalendar':
-          return {
-            Component: DailyScheduleDefault,
-            color: colors.gray400,
-          };
         default:
           return {
             Component: DailyScheduleDefault,
@@ -88,7 +99,7 @@ const DailySchedule = ({ selectedDate, selectedProfile }) => {
       }
     };
 
-    const { Component, color } = getScheduleComponent(item.category);
+    const { Component, color } = getScheduleComponent(item.category, item.eventType);
 
     // 일정 컴포넌트 렌더링
     return (
