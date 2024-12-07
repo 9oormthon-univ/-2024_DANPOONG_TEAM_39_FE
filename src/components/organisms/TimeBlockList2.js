@@ -35,6 +35,7 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
   const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
   const [loading, setLoading] = useState(true);
 
+  // 색상 설정
   const categoryColors = {
     meal: colors.scheduleMeal,
     hospital: colors.scheduleHospital,
@@ -42,6 +43,12 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
     rest: colors.scheduleBreak,
     others: colors.scheduleEtc,
     myCalendar: colors.gray400,
+  };
+
+  const eventTypeColors = {
+    수업: '#9CBA90',
+    약속: '#7CC1C7',
+    집안일: '#84929B',
   };
 
   // 선택된 프로필 ID를 출력
@@ -59,7 +66,8 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
         const response = await axios.get(`http://34.236.139.89:8080/api/calendar/${selectedProfile?.id}`);
         const apiTasks = response.data.data.map((task, index) => ({
           id: String(index + 1),
-          category: task.category || 'others',
+          category: task.category || null,
+          eventType: task.eventType || 'others',
           title: task.title || 'No Title',
           date: task.date || '2024-12-01',
           startTime: task.startTime.slice(0, 5) || '00:00',
@@ -94,7 +102,7 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
   if (loading) {
     return (
       <View style={styles.timelineContainer}>
-        <Text>Loading tasks...</Text>
+        <Text>Loading...</Text>
       </View>
     );
   }
@@ -137,9 +145,11 @@ const TimeBlockList = ({ weekDates, selectedProfile }) => {
           const widthPercentage = totalWidth / DAYS_IN_WEEK;
           const leftPercentage = LEFT_PADDING + currentDay * (widthPercentage + GAP_BETWEEN_COLUMNS);
 
-          const backgroundColor = categoryColors[task.category];
+          // 색상 결정
+          const backgroundColor = task.category === 'myCalendar'
+            ? eventTypeColors[task.eventType] || colors.gray400 // eventType에 따라 색상 결정
+            : categoryColors[task.category] || colors.gray400; // 기본 category 색상
 
-          // Task 블록 렌더링
           return (
             <View
               key={task.id}

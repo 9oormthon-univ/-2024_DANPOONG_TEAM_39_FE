@@ -72,70 +72,70 @@ const WelfareSearch = ({ navigation }) => {
   };
 
   return (
-      <>
-        {/* 상단 SafeAreaView만 적용 */}
-        <SafeAreaView edges={['top']} style={{ backgroundColor: colors.white000 }} />
+    <>
+      {/* 상단 SafeAreaView만 적용 */}
+      <SafeAreaView edges={['top']} style={{ backgroundColor: colors.white000 }} />
 
-        {/* 나머지 화면 */}
-        <View style={styles.container}>
-          {/* Top Bar */}
-          <View style={styles.header}>
-            <WelfareHeader />
+      {/* 나머지 화면 */}
+      <View style={styles.container}>
+        {/* Top Bar */}
+        <View style={styles.header}>
+          <WelfareHeader />
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          {/* Text Field */}
+          <View style={styles.textFieldContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="복지 서비스 검색..."
+              placeholderTextColor={colors.gray600}
+              value={inputValue} // 입력된 값
+              onChangeText={(text) => setInputValue(text)} // 값 변경 시 업데이트
+            />
+            <TouchableOpacity onPress={handleSearch}>
+              <Search style={styles.searchIcon} />
+            </TouchableOpacity>
           </View>
 
-          <ScrollView contentContainerStyle={styles.scrollContent}>
-            {/* Text Field */}
-            <View style={styles.textFieldContainer}>
-              <TextInput
-                  style={styles.textInput}
-                  placeholder="복지 서비스 검색..."
-                  placeholderTextColor={colors.gray600}
-                  value={inputValue} // 입력된 값
-                  onChangeText={(text) => setInputValue(text)} // 값 변경 시 업데이트
-              />
-              <TouchableOpacity onPress={handleSearch}>
-                <Search style={styles.searchIcon} />
-              </TouchableOpacity>
-            </View>
+          {/* 검색 정보 */}
+          <View style={styles.SearchInfo}>
+            <Text style={styles.SearchInfoText}>
+              "{inputValue}" 검색 결과{' '}
+              <Text style={styles.SearchResultsCount}> {totalCount}건</Text>
+            </Text>
+          </View>
 
-            {/* 검색 정보 */}
-            <View style={styles.SearchInfo}>
-              <Text style={styles.SearchInfoText}>
-                "{inputValue}" 검색 결과{' '}
-                <Text style={styles.SearchResultsCount}> {totalCount}건</Text>
-              </Text>
-            </View>
-
-            {/* 복지 정보 섹션 */}
-            <View style={styles.WelfareArea}>
-              {/* 매핑된 복지 서비스 목록 */}
-              {searchResults.map((item, index) => (
-                  <View key={index} style={styles.WelContainer}>
-                    <View style={styles.WelCenter}>
-                      <View style={styles.WelContents}>
-                        <Text style={styles.WelTitle}>
-                          {item.servNm} {/* 복지 서비스 이름 */}
-                        </Text>
-                        <Text numberOfLines={3} ellipsizeMode="tail" style={styles.WelText}>
-                          {item.servDgst} {/* 복지 서비스 상세 내용 */}
-                        </Text>
-                        <TouchableOpacity onPress={() => openLink(item.servDtlLink)}>
-                          <View style={styles.WelAdd}>
-                            <Text style={styles.WelLink}>자세히 보기</Text>
-                            <View style={styles.AddIcon}><RightChevron /></View>
-                          </View>
-                        </TouchableOpacity>
+          {/* 복지 정보 섹션 */}
+          <View style={styles.WelfareArea}>
+            {/* 매핑된 복지 서비스 목록 */}
+            {searchResults.map((item, index) => (
+              <View key={index} style={styles.WelContainer}>
+                <View style={styles.WelCenter}>
+                  <View style={styles.WelContents}>
+                    <Text style={styles.WelTitle}>
+                      {item.servNm} {/* 복지 서비스 이름 */}
+                    </Text>
+                    <Text numberOfLines={3} ellipsizeMode="tail" style={styles.WelText}>
+                      {item.servDgst} {/* 복지 서비스 상세 내용 */}
+                    </Text>
+                    <TouchableOpacity onPress={() => openLink(item.servDtlLink)}>
+                      <View style={styles.WelAdd}>
+                        <Text style={styles.WelLink}>자세히 보기</Text>
+                        <View style={styles.AddIcon}><RightChevron /></View>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   </View>
-              ))}
-            </View>
+                </View>
+              </View>
+            ))}
+          </View>
 
-            {/* 로딩 상태 */}
-            {loading && <Text style={styles.loadingText}>검색 중...</Text>}
-          </ScrollView>
-        </View>
-      </>
+          {/* 로딩 상태 */}
+          {loading && <Text style={styles.loadingText}>검색 중...</Text>}
+        </ScrollView>
+      </View>
+    </>
   );
 };
 

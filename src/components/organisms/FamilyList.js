@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, View, TouchableOpacity, Text, Image, StyleSheet, Modal } from 'react-native';
-import Icon from 'react-native-vector-icons/Feather'; // Feather 라이브러리 사용
+import Icon from 'react-native-vector-icons/Feather';
 import HandHeartIcon from '../../assets/images/hand_heart.svg';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
-import InviteCaregiverModal from './InviteCaregiverModal'; // 초대 모달 컴포넌트 가져오기
+import InviteCaregiverModal from './InviteCaregiverModal';
 import textStyles from '../../styles/textStyles';
 
 const FamilyList = ({ onSelectProfile }) => {
   const [profiles, setProfiles] = useState([
     { id: 0, name: '할머니', imagePath: require('../../assets/images/profile.png') },
-  ]); // 초기 프로필
-  const [selectedProfile, setSelectedProfile] = useState(null); // 선택된 프로필 상태
-  const [isInviteModalVisible, setInviteModalVisible] = useState(false); // 모달 상태 관리
+  ]);
+  const [selectedProfile, setSelectedProfile] = useState(0); // 초기값을 '할머니'의 id로 설정
+  const [isInviteModalVisible, setInviteModalVisible] = useState(false);
 
   // API에서 프로필 데이터 가져오기
   useEffect(() => {
@@ -21,33 +21,50 @@ const FamilyList = ({ onSelectProfile }) => {
         const response = await fetch('http://34.236.139.89:8080/api/careCalendar/dolbomiList');
         const data = await response.json();
 
-        // 기존 프로필에 API 데이터를 추가
+        // API 데이터를 기반으로 프로필 생성
         const newProfiles = data.map((profile) => ({
           id: profile.id,
           name: profile.member.alias || 'Unknown',
-          imagePath: require('../../assets/images/profile_me.png'), // 고정 이미지 경로
+          imagePath: require('../../assets/images/profile_me.png'),
         }));
 
-        setProfiles((prevProfiles) => [...prevProfiles, ...newProfiles]);
+        // 기존 프로필과 병합하되, 중복 제거
+        setProfiles((prevProfiles) => {
+          const allProfiles = [...prevProfiles, ...newProfiles];
+          const uniqueProfiles = allProfiles.filter(
+            (profile, index, self) =>
+              index === self.findIndex((p) => p.id === profile.id) // 중복 제거
+          );
+          return uniqueProfiles;
+        });
       } catch (error) {
         console.error('Error fetching profiles:', error);
       }
     };
-
+  
     fetchProfiles();
   }, []);
+  
+
+  // 앱 실행 시 기본 프로필 선택
+  useEffect(() => {
+    const initialProfile = profiles.find((profile) => profile.id === selectedProfile);
+    if (initialProfile) {
+      onSelectProfile(initialProfile);
+    }
+  }, [profiles]); // profiles가 업데이트될 때 실행
 
   const handleProfileSelect = (profile) => {
-    setSelectedProfile(profile.id); // 선택된 프로필 상태 업데이트
-    onSelectProfile(profile); // 선택된 프로필 전달
+    setSelectedProfile(profile.id);
+    onSelectProfile(profile);
   };
 
   const handleInvite = () => {
-    setInviteModalVisible(true); // 초대 모달 열기
+    setInviteModalVisible(true);
   };
 
   const closeInviteModal = () => {
-    setInviteModalVisible(false); // 초대 모달 닫기
+    setInviteModalVisible(false);
   };
 
   if (!profiles || profiles.length === 0) {
@@ -60,13 +77,13 @@ const FamilyList = ({ onSelectProfile }) => {
 
   return (
     <View style={styles.container}>
-      {/* 첫 번째 프로필을 고정 */}
+      {/* 첫 번째 프로필 고정 */}
       <TouchableOpacity
         style={[
           styles.profileButton,
-          selectedProfile === profiles[0].id && styles.selectedProfile, // 선택된 프로필 스타일 적용
+          selectedProfile === profiles[0].id && styles.selectedProfile,
         ]}
-        onPress={() => handleProfileSelect(profiles[0])} // 첫 번째 프로필 클릭
+        onPress={() => handleProfileSelect(profiles[0])}
       >
         <View
           style={[
@@ -82,7 +99,7 @@ const FamilyList = ({ onSelectProfile }) => {
         </View>
       </TouchableOpacity>
 
-      {/* 나머지 프로필들은 가로 스크롤 */}
+      {/* 나머지 프로필은 가로 스크롤 */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -90,12 +107,12 @@ const FamilyList = ({ onSelectProfile }) => {
       >
         {profiles.slice(1).map((profile) => (
           <TouchableOpacity
-            key={profile.id}
+            key={profile.id} // id를 고유 key로 사용
             style={[
               styles.profileButton,
-              selectedProfile === profile.id && styles.selectedProfile, // 선택된 프로필 스타일 적용
+              selectedProfile === profile.id && styles.selectedProfile,
             ]}
-            onPress={() => handleProfileSelect(profile)} // 나머지 프로필 클릭
+            onPress={() => handleProfileSelect(profile)}
           >
             <View
               style={[
@@ -109,7 +126,7 @@ const FamilyList = ({ onSelectProfile }) => {
           </TouchableOpacity>
         ))}
 
-        {/* 마지막에 + 버튼 추가 */}
+        {/* + 버튼 */}
         <TouchableOpacity style={styles.inviteButton} onPress={handleInvite}>
           <View style={styles.addButton}>
             <Icon name="plus" size={32} color={colors.primary001} />
@@ -140,7 +157,7 @@ const styles = StyleSheet.create({
   },
   profileButton: {
     alignItems: 'center',
-    justifyContent: 'center', // 수직 가운데 정렬
+    justifyContent: 'center',
     marginHorizontal: 10,
   },
   inviteButton: {
@@ -151,10 +168,10 @@ const styles = StyleSheet.create({
   addButton: {
     width: 58,
     height: 58,
-    borderRadius: 29, // 원형 버튼
+    borderRadius: 29,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.primary004, // 원형 버튼 색상
+    backgroundColor: colors.primary004,
   },
   inviteText: {
     marginTop: 8,
@@ -162,7 +179,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     ...textStyles.title14Bold,
     fontFamily: fonts.semiBold,
-    color: colors.white000, // 텍스트 색상
+    color: colors.white000,
     textAlign: 'center',
   },
   imageWrapper: {
@@ -173,8 +190,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedImageWrapper: {
-    borderWidth: 4, // 선택된 프로필의 보더 두께
-    borderColor: colors.white000, // 선택된 프로필의 보더 색상
+    borderWidth: 4,
+    borderColor: colors.white000,
   },
   image: {
     width: 58,
@@ -182,19 +199,19 @@ const styles = StyleSheet.create({
     borderRadius: 29,
   },
   textContainer: {
-    flexDirection: 'row', // 텍스트와 아이콘을 가로로 배치
-    alignItems: 'center', // 수직 가운데 정렬
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   text: {
     marginTop: 5,
     fontFamily: fonts.semiBold,
-    textAlignVertical: 'center', // 텍스트의 수직 정렬
+    textAlignVertical: 'center',
     fontSize: 14,
     color: colors.white000,
   },
   icon: {
     marginLeft: 2,
-    textAlignVertical: 'center', // 텍스트의 수직 정렬
+    textAlignVertical: 'center',
   },
   selectedProfile: {
     borderRadius: 30,

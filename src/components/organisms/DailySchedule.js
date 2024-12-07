@@ -1,8 +1,6 @@
 import { LogBox } from 'react-native';
 LogBox.ignoreAllLogs(true);
 
-
-
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, FlatList, View, Text } from 'react-native';
 import DailyScheduleDefault from '../atoms/DailyScheduleDefault';
@@ -145,7 +143,7 @@ const DailySchedule = ({ selectedDate }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>Loading...</Text>\
+        <Text></Text>
       </View>
     );
   }

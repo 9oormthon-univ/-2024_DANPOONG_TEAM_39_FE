@@ -28,7 +28,7 @@ export default {
 
   // Schedule
   scheduleMeal: '#E37944',
-  scheduleBreak: '#B1B06C',
+  scheduleBreak: '#D1B06C',
   scheduleHospital: '#F09639',
   scheduleEtc: '#F7B532',
 };
