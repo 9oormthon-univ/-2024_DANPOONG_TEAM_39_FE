@@ -1,19 +1,28 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { LogBox } from 'react-native';
+LogBox.ignoreAllLogs(true);
+
+
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
+import axios from 'axios';
 import fonts from '../../styles/fonts';
 import colors from '../../styles/colors';
 import AlertIcon from '../../assets/images/alert.png'; // PNG 이미지 가져오기
+import Popup from '../atoms/Popup'; // Popup 컴포넌트 가져오기
 
 const HOUR_HEIGHT = 60; // 1시간의 높이를 60px로 설정
 const DAYS_IN_WEEK = 7; // 일요일~토요일 기준
 const LEFT_PADDING = 7; // 왼쪽 패딩
 const RIGHT_PADDING = 2.5; // 오른쪽 패딩
 const GAP_BETWEEN_COLUMNS = 1; // 열 사이의 간격
+const START_HOUR = 9; // 시작 시간을 오전 9시로 설정
 
 // '10:30' -> 픽셀 단위로 변환
 const timeToPosition = (time) => {
   const [hour, minute] = time.split(':').map(Number);
-  return hour * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
+  const relativeHour = hour - START_HOUR; // 오전 9시 기준으로 상대 시간 계산
+  return relativeHour * HOUR_HEIGHT + (minute / 60) * HOUR_HEIGHT;
 };
 
 // 블록 높이 계산 ('10:30' ~ '11:15')
@@ -23,35 +32,87 @@ const calculateBlockHeight = (startTime, endTime) => {
   return end - start;
 };
 
-const TimeBlockList = ({ tasks, weekDates }) => {
+const TimeBlockList = ({ weekDates }) => {
+  const [tasks, setTasks] = useState([]);
+  const [popupVisible, setPopupVisible] = useState(false); // 팝업 상태
+  const [popupInfo, setPopupInfo] = useState(null); // 팝업에 표시할 정보
+  const [loading, setLoading] = useState(true);
+
   const categoryColors = {
-    '식사': colors.scheduleMeal,
-    '병원': colors.scheduleHospital,
-    '휴식': colors.scheduleBreak,
-    '기타': colors.scheduleEtc,
-    '내 일정': colors.gray400,
+    meal: colors.scheduleMeal,
+    hospital: colors.scheduleHospital,
+    medication: colors.scheduleMeal,
+    rest: colors.scheduleBreak,
+    others: colors.scheduleEtc,
+    myCalendar: colors.gray400,
   };
+
+  // API 호출
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/all');
+        const apiTasks = response.data.map((task) => ({
+          id: String(task.id),
+          category: task.category || 'others',
+          title: task.title || 'No Title',
+          date: task.date || '2024-12-01',
+          startTime: task.startTime.slice(0, 5) || '00:00',
+          endTime: task.endTime.slice(0, 5) || '00:00',
+          isAlarm: task.isAlarm || false,
+          hasRecommendation: task.hasRecommendation || false,
+          isShared: task.isShared || false,
+          location: task.location || 'No Location',
+        }));
+        setTasks(apiTasks);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTasks();
+  }, []);
+
+  const handleOpenPopup = (time, endTime, date) => {
+    setPopupInfo({ time, endTime, date }); // 팝업에 표시할 정보 설정
+    console.log("위클리팝업ㄴㄴ"+date, time, endTime);
+    setPopupVisible(true); // 팝업 열기
+  };
+
+  const handleClosePopup = () => {
+    setPopupVisible(false); // 팝업 닫기
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.timelineContainer}>
+        <Text>Loading tasks...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.timelineContainer}>
-      {/* 시간 슬롯 표시 */}
-      {Array.from({ length: 24 }).map((_, index) => (
+      {/* 시간 슬롯 표시: 오전 9시부터 시작 */}
+      {Array.from({ length: 24 - START_HOUR }).map((_, index) => (
         <View
-          key={index}
+          key={index + START_HOUR}
           style={[
             styles.timeSlot,
             index === 0 && styles.firstTimeSlot,
           ]}
         >
           <Text style={styles.timeText}>
-            {index < 12 ? '오전\n' : '오후\n'} {index % 12 === 0 ? 12 : index % 12}시
+            {index + START_HOUR < 12 ? '오전\n' : '오후\n'}
+            {(index + START_HOUR) % 12 === 0 ? 12 : (index + START_HOUR) % 12}시
           </Text>
         </View>
       ))}
 
       {/* 날짜별 Task 처리 */}
       {weekDates.map((weekDate) => {
-        // 같은 날짜의 Task를 필터링하고 시작 시간 순으로 정렬
         const tasksOnDate = tasks
           .filter((task) => task.date === weekDate.format('YYYY-MM-DD'))
           .sort((a, b) => timeToPosition(a.startTime) - timeToPosition(b.startTime));
@@ -84,7 +145,7 @@ const TimeBlockList = ({ tasks, weekDates }) => {
               return (
                 <React.Fragment key={`gap-${task.id}`}>
                   {/* 공백 블록 */}
-                  <View
+                  <TouchableOpacity
                     style={[
                       styles.alertBlock,
                       {
@@ -94,15 +155,14 @@ const TimeBlockList = ({ tasks, weekDates }) => {
                         width: `${widthPercentage}%`,
                       },
                     ]}
+                    onPress={() =>
+                      handleOpenPopup(previousTask.endTime, task.startTime, task.date)
+                    }
                   >
-                    {/* 공백 아이콘 */}
                     <View style={styles.alertIcon}>
-                      <Image
-                        source={AlertIcon}
-                       
-                      />
+                      <Image source={AlertIcon} style={styles.alertIconImage} />
                     </View>
-                  </View>
+                  </TouchableOpacity>
 
                   {/* 현재 Task */}
                   <View
@@ -144,6 +204,22 @@ const TimeBlockList = ({ tasks, weekDates }) => {
           );
         });
       })}
+
+      {/* 팝업 컴포넌트 */}
+      <Modal
+        visible={popupVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleClosePopup}
+      >
+        <Popup
+            info={popupInfo}
+            onClose={handleClosePopup}
+            time={popupInfo?.time}  // popupInfo에서 time 전달
+            endTime={popupInfo?.endTime}  // popupInfo에서 endTime 전달
+            date={popupInfo?.date}  // popupInfo에서 date 전달
+        />
+      </Modal>
     </View>
   );
 };
@@ -190,16 +266,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary003,
     borderRadius: 8,
     zIndex: 1,
-    //padding: 5,
-    justifyContent: 'flex-start', // 내부 요소를 상단 정렬
-    alignItems: 'center', // 수평 중앙 정렬
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
   alertIcon: {
     position: 'absolute',
-    top: -30, // 블록 위로 삐져나오도록 위치 조정
-    right: -6,
-    alignSelf: 'center', // 부모 블록의 중앙에 맞춤
-    zIndex: 2, // 블록 위로 표시되도록 설정
+    top: -10,
+    alignSelf: 'center',
+    zIndex: 2,
+  },
+  alertIconImage: {
+    left: -3,
+    width: 50,
+    height: 50,
   },
 });
 

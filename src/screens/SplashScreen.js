@@ -1,6 +1,8 @@
 // src/screens/SplashScreen.js
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet } from 'react-native';
+import colors from '../styles/colors';
+
 
 export default function SplashScreen({ navigation }) {
   useEffect(() => {
@@ -23,7 +25,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.primary001,
   },
   image: {
     width: 96,

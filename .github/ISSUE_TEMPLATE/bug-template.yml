@@ -1,0 +1,18 @@
+name: "🐛 Bug Fix"
+description: "발견된 버그를 수정하는 작업에 대한 이슈"
+labels: ["bug", "fix"]
+body:
+  - type: textarea
+    attributes:
+      label: 🐞 수정할 버그 설명
+      description: 수정해야 할 버그에 대한 설명을 작성해 주세요.
+      placeholder: "버그의 문제점을 자세히 작성해 주세요."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 버그를 수정하기 위한 작업 계획을 작성해 주세요. (체크박스로 작성 권장)
+      placeholder: "- [ ] 원인 파악\n- [ ] 수정\n- [ ] 테스트 작성 및 검증"
+    validations:
+      required: true

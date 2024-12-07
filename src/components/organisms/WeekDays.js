@@ -4,7 +4,7 @@ import moment from 'moment';
 import colors from '../../styles/colors';
 import fonts from '../../styles/fonts';
 
-const WeekDays = ({ currentWeek }) => {
+const WeekDays = ({ currentWeek, onDateSelect }) => {
   const [selectedDate, setSelectedDate] = useState(moment().format('YYYY-MM-DD')); // 선택된 날짜
   const [weekDates, setWeekDates] = useState([]); // 현재 주의 날짜 배열
 
@@ -16,7 +16,11 @@ const WeekDays = ({ currentWeek }) => {
     setWeekDates(dates); // 해당 주의 날짜 배열로 설정
   }, [currentWeek]);
 
-  // 요일 스타일 설정
+  const handleDatePress = (date) => {
+    setSelectedDate(date); // 내부 상태 업데이트
+    onDateSelect(date); // 부모로 선택된 날짜 전달
+  };
+
   const getDayStyles = (day, isSelected) => {
     if (isSelected) {
       return {
@@ -47,7 +51,7 @@ const WeekDays = ({ currentWeek }) => {
           <TouchableOpacity
             key={index}
             style={[styles.dateContainer, container]}
-            onPress={() => setSelectedDate(dateObj.format('YYYY-MM-DD'))}
+            onPress={() => handleDatePress(dateObj.format('YYYY-MM-DD'))}
           >
             <Text style={[styles.dayText, dayText]}>{day}</Text>
             <Text style={[styles.dateText, dateText]}>{date}</Text>
@@ -69,8 +73,8 @@ const styles = StyleSheet.create({
   dateContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 46, // 각 날짜 컨테이너의 너비 고정
-    height: 65, // 컨테이너 높이
+    width: 46,
+    height: 65,
     borderTopEndRadius: 8,
   },
   dayText: {
@@ -83,38 +87,20 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     lineHeight: 19,
   },
-  // 요일/날짜 스타일
-  sundayText: {
-    color: colors.secondary002,
-  },
-  sundayDateText: {
-    color: colors.secondary001,
-  },
-  saturdayText: {
-    color: colors.primary002,
-  },
-  saturdayDateText: {
-    color: colors.primary001,
-  },
-  weekdayText: {
-    color: colors.gray700,
-  },
-  weekdayDateText: {
-    color: colors.gray900,
-  },
-  // 선택된 날짜 스타일
+  sundayText: { color: colors.secondary002 },
+  sundayDateText: { color: colors.secondary001 },
+  saturdayText: { color: colors.primary002 },
+  saturdayDateText: { color: colors.primary001 },
+  weekdayText: { color: colors.gray700 },
+  weekdayDateText: { color: colors.gray900 },
   selectedContainer: {
     backgroundColor: '#FF7F00',
-    borderTopLeftRadius: 10, // 왼쪽 상단 둥근 모서리
+    borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     paddingVertical: 6,
   },
-  selectedDayText: {
-    color: '#FDFCFC',
-  },
-  selectedDateText: {
-    color: '#FDFCFC',
-  },
+  selectedDayText: { color: '#FDFCFC' },
+  selectedDateText: { color: '#FDFCFC' },
 });
 
 export default WeekDays;

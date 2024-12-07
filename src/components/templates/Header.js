@@ -1,19 +1,21 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import HeaderBell from '../../assets/images/header_bell.svg';
+import HeaderMenu from '../../assets/images/header_menu.svg';
 
-const Header = () => {
+const Header = ({ onMenuPress }) => {
   return (
     <View style={styles.header}>
+      <Image
+        source={require('../../assets/images/icon_songil_text.png')}
+        style={styles.textIcon}
+      />
       <View style={styles.iconContainer}>
-        {/* 알림 아이콘 */}
         <TouchableOpacity style={styles.icon}>
-          <Image source={require('../../assets/images/bell.png')} />
+          <HeaderBell />
         </TouchableOpacity>
-
-        {/* 메뉴 아이콘 */}
-        <TouchableOpacity style={styles.icon}>
-          <Image source={require('../../assets/images/menu.png')} />
+        <TouchableOpacity style={styles.icon} onPress={onMenuPress}>
+          <HeaderMenu />
         </TouchableOpacity>
       </View>
     </View>
@@ -23,18 +25,26 @@ const Header = () => {
 const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
-    paddingHorizontal: 10,  // 좌우 여백을 20px로 설정
-    paddingVertical: 16,    // 상하 여백을 16px로 설정
-    backgroundColor: '#FF7F00', // 배경색 추가 (아이콘이 하얀색이라 배경색이 필요)
-    alignItems: 'center',   // 자식 요소를 수직 가운데 정렬
-    justifyContent: 'flex-end', // 아이콘들이 오른쪽 끝으로 정렬되도록 설정
+    paddingHorizontal: 10,
+    paddingVertical: 16,
+    backgroundColor: '#FF7F00',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  textIcon: {
+    position: 'absolute',
+    left: 0,
+    width: 100,
+    height: 24,
+    resizeMode: 'contain',
   },
   iconContainer: {
-    flexDirection: 'row',   // 아이콘을 가로로 나열
-    alignItems: 'center',   // 아이콘을 수직 가운데 정렬
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
   },
   icon: {
-    marginRight: 8,         // 아이콘 간 간격을 8px로 설정
+    marginRight: 8,
   },
 });
 
