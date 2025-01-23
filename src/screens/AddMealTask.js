@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import CategoryPicker from '../components/atoms/CategoryPicker';
 import SegmentedControl from '../components/atoms/SegmentedControl';
@@ -11,9 +11,10 @@ import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
 import TaskPlace from '../components/molecules/TaskPlace';
 import TaskMemo from '../components/molecules/TaskMemo';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
-import fonts from '../styles/fonts';
 import colors from '../styles/colors';
 import { LogBox } from 'react-native';
+import axios from 'axios';
+import TaskRepeat from '../components/atoms/TaskRepeat';
 
 // 특정 경고 메시지를 무시
 LogBox.ignoreLogs([
@@ -22,38 +23,136 @@ LogBox.ignoreLogs([
 
 const AddMealTask = ({ route }) => {
   const navigation = useNavigation();
-  const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  const [selectedTime, setSelectedTime] = useState(null); // 선택된 식사 시간
-  const [name, setName] = useState(route.params?.familyName || '김구름');
-  
-  // 카테고리별 페이지 맵핑
-  const categoryRoutes = {
-    hospital: 'AddHospitalTask',
-    medication: 'AddPillTask',
-    others: 'AddOthersTask',
-    rest: 'AddRestTask',
+
+  // JSON 데이터와 매핑된 상태 관리 변수들
+  const [id, setId] = useState(null);
+  const [title, setTitle] = useState('');
+  const [eventType, setEventType] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [date, setDate] = useState('');
+  const [repeatCycle, setRepeatCycle] = useState(null);
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [isAlarm, setIsAlarm] = useState(false);
+  const [location, setLocation] = useState('');
+  const [memo, setMemo] = useState('');
+  const [isShared, setIsShared] = useState(true);
+  const [careAssignment, setCareAssignment] = useState(null);
+  const [careAssignmentId, setCareAssignmentId] = useState(null);
+  const [meal, setMeal] = useState(null);
+  const [category, setCategory] = useState('meal');
+  const [mealType, setMealType] = useState([]);
+  const [careAssignments, setCareAssignments] = useState([
+    {
+      id: null,
+      member: {
+        id: null,
+        name: null,
+        alias: '',
+        age: 0,
+        gender: null,
+        email: '',
+      },
+      email: '',
+      relationship: '',
+      calendar: null,
+    },
+  ]);
+
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isCaregiverNotNeeded, setIsCaregiverNotNeeded] = useState(false);
+
+  const [isLocationChecked, setIsLocationChecked] = useState(false); // 자택 여부
+  const [isCheckedStartTime, setIsCheckedStartTime] = useState(false); // StartTimeEndTime 체크박스 상태
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/meal');
+        console.log('Server Response:', response.data);
+
+        const data = response.data.calendar;
+
+        setId(data.id);
+        setTitle(data.title);
+        setStartTime(data.startTime);
+        setEndTime(data.endTime);
+        setDate(data.date);
+        setRepeatCycle(data.repeatCycle);
+        setIsAllDay(data.isAllday);
+        setIsAlarm(data.isAlarm);
+        setLocation(data.location);
+        setMemo(data.memo);
+        setIsShared(data.isShared);
+        setCareAssignment(data.careAssignment);
+        setCareAssignmentId(data.careAssignmentId);
+        setSelectedProfile(data.careAssignmentId);
+        setMeal(data.meal);
+        setCategory(data.category);
+        setCareAssignments(data.careAssignments);
+        setMealType(response.data.mealType);
+        console.log('[CareAssignments]:', JSON.stringify(data.careAssignments, null, 2));
+        console.log('Meal Type:', response.data.mealType);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const convertToServerTimeFormat = (time) => {
+    if (!time) return null;
+
+    const [period, rawTime] = time.split(' ');
+    const [hours, minutes] = rawTime.split(':').map(Number);
+
+    let formattedHours = period === '오후' && hours !== 12 ? hours + 12 : hours;
+    if (period === '오전' && hours === 12) formattedHours = 0;
+
+    return `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
   };
 
-  // 카테고리 선택 처리
-  const handleCategorySelect = (category) => {
-    if (selectedCategory === category) return; // 이미 선택된 카테고리라면 이동하지 않음
-    setSelectedCategory(category);
+  const convertToServerDateFormat = (date) => {
+    if (!date) return null;
 
-    const route = categoryRoutes[category] || 'AddMealTask'; // 기본 경로 설정
-    navigation.navigate(route); // 카테고리별 페이지로 이동
+    const match = date.match(/(\d{4})년\s(\d{1,2})월\s(\d{1,2})일/);
+    if (!match) {
+      console.error(`Invalid date format: ${date}`);
+      return null;
+    }
+
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  const handleRegister = () => {
-    // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
-    navigation.replace('HomeScreen');
-  };
+  const handleRegister = async () => {
+    const payload = {
+      title,
+      eventType,
+      startTime: convertToServerTimeFormat(startTime),
+      endTime: convertToServerTimeFormat(endTime),
+      date: convertToServerDateFormat(date),
+      repeatCycle,
+      isAllDay,
+      isAlarm,
+      location,
+      memo,
+      isShared,
+      careAssignment,
+      careAssignmentId: selectedProfile,
+      mealType: meal,
+      category,
+    };
 
-  const segments = [
-    { label: '아침', value: 'morning' },
-    { label: '점심', value: 'lunch' },
-    { label: '저녁', value: 'dinner' },
-    { label: '기타', value: 'others' },
-  ];
+    try {
+      const response = await axios.post('http://34.236.139.89:8080/api/careCalendar/meal', payload);
+      console.log('Successfully posted data:', response.data);
+      navigation.replace('HomeScreen');
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -62,62 +161,94 @@ const AddMealTask = ({ route }) => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 카테고리 선택 */}
         <View style={styles.component}>
           <CategoryPicker
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
+            selectedCategory={category}
+            onSelectCategory={(value) => setCategory(value)}
           />
         </View>
 
-        {/* 식사 시간 세그먼트 */}
         <View style={styles.component}>
           <SegmentedControl
-            segments={segments}
-            onSegmentPress={setSelectedTime}
-            selectedSegments={selectedTime}
+            segments={mealType.map((type) => ({ label: type, value: type }))}
+            onSegmentPress={(value) => setMeal(value)}
+            selectedSegment={meal}
             label="식사 시간"
             isRequired={true}
           />
         </View>
+
         <View style={styles.component}>
           <CaregiverSelectionRow
-            label="돌보미 선택"
-            initialValue={name}
-            onValueChange={setName}
+            careAssignments={careAssignments}
+            selectedProfile={selectedProfile}
+            isCaregiverNotNeeded={isCaregiverNotNeeded}
+            onProfileSelect={(profileId) => {
+              if (!isCaregiverNotNeeded) {
+                setSelectedProfile(profileId);
+                setCareAssignmentId(profileId);
+              }
+            }}
+            onToggleCheck={() => setIsCaregiverNotNeeded(!isCaregiverNotNeeded)}
           />
         </View>
-        {/* 일정명 입력 */}
+
         <View style={styles.component}>
-          <TaskNameInput />
+          <TaskNameInput
+            value={title}
+            onValueChange={(value) => setTitle(value)}
+          />
         </View>
 
-        {/* 일정 날짜 선택 */}
         <View style={styles.component}>
-          <TaskDatePickerButton defaultText="일정 일자 선택" />
+          <TaskDatePickerButton
+            selectedDate={date}
+            onDateChange={(value) => setDate(value)}
+          />
         </View>
 
-        {/* 시작 시간 ~ 종료 시간 */}
         <View style={styles.component}>
-          <StartTimeEndTime />
+          <StartTimeEndTime
+            startTime={startTime}
+            endTime={endTime}
+            isChecked={isCheckedStartTime}
+            onStartTimeChange={(value) => setStartTime(value)}
+            onEndTimeChange={(value) => setEndTime(value)}
+            onToggleCheck={() => setIsCheckedStartTime(!isCheckedStartTime)}
+          />
         </View>
 
-        {/* 알림 설정 */}
         <View style={styles.component}>
-          <TaskIsAlarmed />
+          <TaskIsAlarmed
+            isAlarmed={isAlarm}
+            onToggleAlarm={(value) => setIsAlarm(value)}
+          />
         </View>
 
-        {/* 장소 설정 */}
         <View style={styles.component}>
-          <TaskPlace />
+          <TaskRepeat
+            placeholder="반복 주기"
+            repeatCycle={repeatCycle}
+            onSelectOption={(option) => setRepeatCycle(option)}
+          />
         </View>
 
-        {/* 메모 */}
         <View style={styles.component}>
-          <TaskMemo />
+          <TaskPlace
+            location={location}
+            isChecked={isLocationChecked}
+            onValueChange={(value) => setLocation(value)}
+            onToggleCheck={() => setIsLocationChecked(!isLocationChecked)}
+          />
         </View>
 
-        {/* 등록 버튼 */}
+        <View style={styles.component}>
+          <TaskMemo
+            memo={memo}
+            onValueChange={(value) => setMemo(value)}
+          />
+        </View>
+
         <View style={styles.component}>
           <TaskAbledButton text="등록" onPress={handleRegister} />
         </View>
@@ -139,13 +270,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   component: {
-    marginBottom: 24, // 컴포넌트 간 간격
-  },
-  title: {
-    fontSize: 16,
-    fontFamily: fonts.semiBold,
-    color: colors.gray900,
-    marginBottom: 8, // 제목과 컴포넌트 간 간격
+    marginBottom: 24,
   },
 });
 
