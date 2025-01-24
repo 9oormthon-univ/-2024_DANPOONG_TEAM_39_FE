@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // React Navigation 훅
-import colors from '../styles/colors';
+import { useNavigation } from '@react-navigation/native';
 import CategoryPicker from '../components/atoms/CategoryPicker';
+import SegmentedControl from '../components/atoms/SegmentedControl';
 import CaregiverSelectionRow from '../components/molecules/CaregiverSelectionRow';
 import TaskNameInput from '../components/molecules/TaskNameInput';
 import TaskDatePickerButton from '../components/atoms/TaskDatePickerButton';
@@ -10,10 +10,10 @@ import StartTimeEndTime from '../components/molecules/StartTimeEndTime';
 import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
 import TaskPlace from '../components/molecules/TaskPlace';
 import TaskMemo from '../components/molecules/TaskMemo';
-import SegmentedControl from '../components/atoms/SegmentedControl';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
-import TaskRepeat from '../components/atoms/TaskRepeat';
+import colors from '../styles/colors';
 import { LogBox } from 'react-native';
+import axios from 'axios';
 
 // 특정 경고 메시지를 무시
 LogBox.ignoreLogs([
@@ -21,112 +21,183 @@ LogBox.ignoreLogs([
 ]);
 
 const AddHospitalTask = ({ route }) => {
-  const navigation = useNavigation(); // 네비게이션 객체 가져오기
-  const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  const [selectedTime, setSelectedTime] = useState(null); // 선택된 이동 방식
-  const [name, setName] = useState(route.params?.familyName || '김구름');
+  const navigation = useNavigation();
 
-  // 카테고리별 페이지 맵핑
-  const categoryRoutes = {
-    meal: 'AddMealTask',
-    medication: 'AddPillTask',
-    others: 'AddOthersTask',
-    rest: 'AddRestTask',
+  // 상태 관리 변수들
+  const [title, setTitle] = useState('');
+  const [category, setCategory] = useState('hospital');
+  const [transportation, setTransportation] = useState('');
+  const [transportationOptions, setTransportationOptions] = useState([]);
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [isAllDay, setIsAllDay] = useState(false);
+  const [isAlarm, setIsAlarm] = useState(false);
+  const [location, setLocation] = useState('');
+  const [memo, setMemo] = useState('');
+  const [careAssignments, setCareAssignments] = useState([]);
+  const [selectedCaregiver, setSelectedCaregiver] = useState(null);
+  const [isCaregiverNotNeeded, setIsCaregiverNotNeeded] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/hospital');
+        const data = response.data.calendar;
+
+        setTitle(data.title);
+        setDate(data.date);
+        setStartTime(data.startTime);
+        setEndTime(data.endTime);
+        setIsAllDay(data.isAllDay);
+        setIsAlarm(data.isAlarm);
+        setLocation(data.location);
+        setMemo(data.memo);
+        setCareAssignments(data.careAssignments);
+        setSelectedCaregiver(data.careAssignmentId);
+        setTransportation(data.transportation || '');
+        setTransportationOptions(response.data.transportationType || []);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const convertToServerTimeFormat = (time) => {
+    if (!time) return null;
+
+    const [period, rawTime] = time.split(' ');
+    const [hours, minutes] = rawTime.split(':').map(Number);
+
+    let formattedHours = period === '오후' && hours !== 12 ? hours + 12 : hours;
+    if (period === '오전' && hours === 12) formattedHours = 0;
+
+    return `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
   };
 
-  // 카테고리 선택 처리
-  const handleCategorySelect = (category) => {
-    if (selectedCategory === category) return; // 이미 선택된 카테고리라면 이동하지 않음
-    setSelectedCategory(category);
+  const convertToServerDateFormat = (date) => {
+    if (!date) return null;
 
-    const route = categoryRoutes[category] || 'AddHospitalTask'; // 기본 경로 설정
-    navigation.navigate(route); // 카테고리별 페이지로 이동
+    const match = date.match(/(\d{4})년\s(\d{1,2})월\s(\d{1,2})일/);
+    if (!match) {
+      console.error(`Invalid date format: ${date}`);
+      return null;
+    }
+
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
   };
 
-  const handleRegister = () => {
-    // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
-    navigation.replace('HomeScreen'); // 애니메이션 없이 HomeScreen으로 이동
-  };
+  const handleRegister = async () => {
+    const payload = {
+      title,
+      category,
+      transportation,
+      date: convertToServerDateFormat(date),
+      startTime: convertToServerTimeFormat(startTime),
+      endTime: convertToServerTimeFormat(endTime),
+      isAllDay,
+      isAlarm,
+      location,
+      memo,
+      careAssignmentId: selectedCaregiver,
+    };
 
-  const segments = [
-    { label: '도보', value: 'walk' },
-    { label: '택시', value: 'taxi' },
-    { label: '대중교통', value: 'public' },
-    { label: '자동차', value: 'car' },
-  ];
+    try {
+      const response = await axios.post('http://34.236.139.89:8080/api/careCalendar/hospital', payload);
+      console.log('Successfully posted data:', response.data);
+      navigation.replace('HomeScreen');
+    } catch (error) {
+      console.error('Error posting data:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* ScrollView로 컴포넌트 렌더링 */}
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 카테고리 선택 */}
         <View style={styles.component}>
           <CategoryPicker
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
+            selectedCategory={category}
+            onSelectCategory={(value) => setCategory(value)}
           />
         </View>
 
-        {/* 돌보미 선택 */}
         <View style={styles.component}>
           <CaregiverSelectionRow
-            label="돌보미 선택"
-            initialValue={name}
-            onValueChange={setName} // 부모 상태 업데이트
+            careAssignments={careAssignments}
+            selectedProfile={selectedCaregiver}
+            isCaregiverNotNeeded={isCaregiverNotNeeded}
+            onProfileSelect={(profileId) => {
+              if (!isCaregiverNotNeeded) {
+                setSelectedCaregiver(profileId);
+              }
+            }}
+            onToggleCheck={() => setIsCaregiverNotNeeded(!isCaregiverNotNeeded)}
           />
         </View>
 
-        {/* 작업 이름 입력 */}
         <View style={styles.component}>
-          <TaskNameInput />
+          <TaskNameInput
+            value={title}
+            onValueChange={(value) => setTitle(value)}
+          />
         </View>
 
-        {/* 일정 일자 선택 */}
         <View style={styles.component}>
-          <TaskDatePickerButton defaultText="일정 일자 선택" />
+          <TaskDatePickerButton
+            selectedDate={date}
+            onDateChange={(value) => setDate(value)}
+          />
         </View>
 
-        {/* 시작 시간 및 종료 시간 */}
         <View style={styles.component}>
-          <StartTimeEndTime />
+          <StartTimeEndTime
+            startTime={startTime}
+            endTime={endTime}
+            onStartTimeChange={(value) => setStartTime(value)}
+            onEndTimeChange={(value) => setEndTime(value)}
+            isChecked={isAllDay}
+            onToggleCheck={() => setIsAllDay(!isAllDay)}
+          />
         </View>
 
-        {/* 알림 설정 */}
         <View style={styles.component}>
-          <TaskIsAlarmed />
+          <TaskIsAlarmed
+            isAlarmed={isAlarm}
+            onToggleAlarm={(value) => setIsAlarm(value)}
+          />
         </View>
 
-        {/* 반복 설정 */}
-        <View style={styles.component}>
-          <TaskRepeat />
-        </View>
-
-        {/* 이동 방식 선택 */}
         <View style={styles.component}>
           <SegmentedControl
-            segments={segments}
-            onSegmentPress={setSelectedTime}
-            selectedSegments={selectedTime}
+            segments={transportationOptions.map((option) => ({ label: option, value: option }))}
+            onSegmentPress={(value) => setTransportation(value)}
+            selectedSegment={transportation}
             label="이동 방식"
             isRequired={true}
           />
         </View>
 
-        {/* 장소 입력 */}
         <View style={styles.component}>
-          <TaskPlace />
+          <TaskPlace
+            location={location}
+            onValueChange={(value) => setLocation(value)}
+          />
         </View>
 
-        {/* 메모 입력 */}
         <View style={styles.component}>
-          <TaskMemo />
+          <TaskMemo
+            memo={memo}
+            onValueChange={(value) => setMemo(value)}
+          />
         </View>
 
-        {/* 등록 버튼 */}
         <View style={styles.component}>
           <TaskAbledButton text="등록" onPress={handleRegister} />
         </View>
