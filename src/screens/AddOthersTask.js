@@ -1,6 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import CategoryPicker from '../components/atoms/CategoryPicker';
 import CaregiverSelectionRow from '../components/molecules/CaregiverSelectionRow';
 import TaskNameInput from '../components/molecules/TaskNameInput';
@@ -10,122 +11,140 @@ import TaskIsAlarmed from '../components/molecules/TaskIsAlarmed';
 import TaskPlace from '../components/molecules/TaskPlace';
 import TaskMemo from '../components/molecules/TaskMemo';
 import TaskAbledButton from '../components/atoms/TaskAbledButton';
-import fonts from '../styles/fonts';
+import TaskRepeat from '../components/atoms/TaskRepeat';
 import colors from '../styles/colors';
-import { LogBox } from 'react-native';
 
-// 특정 경고 메시지를 무시
-LogBox.ignoreLogs([
-  'VirtualizedLists should never be nested inside plain ScrollViews with the same orientation',
-]);
-
-const AddOthersTask = ({ route }) => {
+const AddOthersTask = () => {
   const navigation = useNavigation();
-  const [selectedCategory, setSelectedCategory] = useState(route.params?.selectedCategory || null);
-  const [name, setName] = useState(route.params?.familyName || '김구름');
-  const [taskName, setTaskName] = useState(route.params?.categoryName || ''); // categoryName을 taskName으로 사용
-   // 카테고리별 페이지 맵핑
-   const categoryRoutes = {
-    hospital: 'AddHospitalTask',
-    medication: 'AddPillTask',
-    meal: 'AddMealTask',
-    rest: 'AddRestTask',
-  };
-  // 카테고리 선택 처리
+
+  // 상태 관리
+  const [title, setTitle] = useState(null);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
+  const [date, setDate] = useState(null);
+  const [repeatCycle, setRepeatCycle] = useState(null);
+  const [isAlarm, setIsAlarm] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [memo, setMemo] = useState(null);
+  const [careAssignments, setCareAssignments] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [category, setCategory] = useState('others');
+
+  // 초기 데이터 로드 (GET 요청)
   useEffect(() => {
-    console.log('현재 taskName 값:', taskName);  // taskName 값 확인
-  }, [taskName]);
-  const handleCategorySelect = (category) => {
-    if (selectedCategory === category) return; // 이미 선택된 카테고리라면 이동하지 않음
-    setSelectedCategory(category);
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://34.236.139.89:8080/api/careCalendar/others');
+        console.log('Server Response:', response.data);
 
-    const route = categoryRoutes[category] || 'AddOthersTask'; // 기본 경로 설정
-    navigation.navigate(route); // 카테고리별 페이지로 이동
+        const data = response.data.calendar;
+
+        setTitle(data.title);
+        setStartTime(data.startTime);
+        setEndTime(data.endTime);
+        setDate(data.date);
+        setRepeatCycle(data.repeatCycle);
+        setIsAlarm(data.isAlarm);
+        setLocation(data.location);
+        setMemo(data.memo);
+        setCareAssignments(data.careAssignments);
+        setSelectedProfile(data.careAssignmentId);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // 서버 형식 변환 함수
+  const convertToServerTimeFormat = (time) => {
+    if (!time) return null;
+    const [period, rawTime] = time.split(' ');
+    const [hours, minutes] = rawTime.split(':').map(Number);
+    let formattedHours = period === '오후' && hours !== 12 ? hours + 12 : hours;
+    if (period === '오전' && hours === 12) formattedHours = 0;
+    return `${String(formattedHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
   };
 
-  const handleRegister = () => {
-    // 특정 화면(HomeScreen)으로 바로 이동하며 현재 화면 대체
-    navigation.replace('HomeScreen');
+  const convertToServerDateFormat = (date) => {
+    if (!date) return null;
+    const match = date.match(/(\d{4})년\s(\d{1,2})월\s(\d{1,2})일/);
+    if (!match) return null;
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
+  // 등록 처리 (POST 요청)
+  const handleRegister = async () => {
+    const payload = {
+      title,
+      startTime: convertToServerTimeFormat(startTime),
+      endTime: convertToServerTimeFormat(endTime),
+      date: convertToServerDateFormat(date),
+      repeatCycle,
+      isAlarm,
+      location,
+      memo,
+      category,
+      careAssignmentId: selectedProfile,
+    };
+
+    try {
+      const response = await axios.post('http://34.236.139.89:8080/api/careCalendar/others', payload);
+      console.log('Successfully posted data:', response.data);
+      navigation.replace('HomeScreen');
+    } catch (error) {
+      console.error('Failed to post data:', error);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* 카테고리 선택 */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.component}>
-          <CategoryPicker
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
+          <CategoryPicker selectedCategory={category} onSelectCategory={setCategory} />
         </View>
-
-        {/* 돌보미 가족 선택 */}
         <View style={styles.component}>
           <CaregiverSelectionRow
-            label="돌보미 가족"
-            initialValue={name}
-            onValueChange={(value) => {}}
+            careAssignments={careAssignments}
+            selectedProfile={selectedProfile}
+            onProfileSelect={setSelectedProfile}
           />
         </View>
-
-        {/* 일정명 입력 */}
         <View style={styles.component}>
-          <TaskNameInput
-              value={taskName.categoryName} // categoryName 값을 입력란에 표시
-              onValueChange={(text) =>
-                  setTaskName((prev) => ({
-                    ...prev, // 기존 상태 유지
-                    categoryName: text, // categoryName만 업데이트
-                  }))
-              }
+          <TaskNameInput value={title} onValueChange={setTitle} />
+        </View>
+        <View style={styles.component}>
+          <TaskDatePickerButton selectedDate={date} onDateChange={setDate} />
+        </View>
+        <View style={styles.component}>
+          <StartTimeEndTime
+            startTime={startTime}
+            endTime={endTime}
+            onStartTimeChange={setStartTime}
+            onEndTimeChange={setEndTime}
           />
         </View>
-        {/* 일정 날짜 선택 */}
         <View style={styles.component}>
-          <TaskDatePickerButton
-              defaultText={taskName.date || '일정 일자 선택'} // 기본값으로 날짜 표시
-              onDateChange={(selectedDate) =>
-                  setTaskName((prev) => ({
-                    ...prev,
-                    date: selectedDate, // 날짜 업데이트
-                  }))
-              }
-          />
+          <TaskIsAlarmed isAlarmed={isAlarm} onToggleAlarm={setIsAlarm} />
         </View>
-
-
-        {/* 시작 시간 ~ 종료 시간 */}
         <View style={styles.component}>
-          <StartTimeEndTime />
+          <TaskRepeat repeatCycle={repeatCycle} onSelectOption={setRepeatCycle} />
         </View>
-
-
-        {/* 알림 설정 */}
         <View style={styles.component}>
-          <TaskIsAlarmed />
+          <TaskPlace location={location} onValueChange={setLocation} />
         </View>
-
-        {/* 장소 설정 */}
         <View style={styles.component}>
-          <TaskPlace />
+          <TaskMemo memo={memo} onValueChange={setMemo} />
         </View>
-
-        {/* 메모 */}
-        <View style={styles.component}>
-          <TaskMemo />
-        </View>
-
-        {/* 등록 버튼 */}
         <View style={styles.component}>
           <TaskAbledButton text="등록" onPress={handleRegister} />
         </View>
       </ScrollView>
     </View>
   );
+  
 };
 
 const styles = StyleSheet.create({
@@ -141,8 +160,9 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   component: {
-    marginBottom: 24, // 컴포넌트 간 간격
+    marginBottom: 24,
   },
 });
+
 
 export default AddOthersTask;

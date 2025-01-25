@@ -35,6 +35,7 @@ const AddHospitalTask = ({ route }) => {
   const [isAlarm, setIsAlarm] = useState(false);
   const [location, setLocation] = useState('');
   const [memo, setMemo] = useState('');
+  const [careAssignment, setCareAssignment] = useState(null);
   const [careAssignments, setCareAssignments] = useState([]);
   const [selectedCaregiver, setSelectedCaregiver] = useState(null);
   const [isCaregiverNotNeeded, setIsCaregiverNotNeeded] = useState(false);
@@ -93,16 +94,19 @@ const AddHospitalTask = ({ route }) => {
   const handleRegister = async () => {
     const payload = {
       title,
-      category,
-      transportation,
-      date: convertToServerDateFormat(date),
+      eventType,
       startTime: convertToServerTimeFormat(startTime),
       endTime: convertToServerTimeFormat(endTime),
+      date: convertToServerDateFormat(date),
+      repeatCycle,
       isAllDay,
       isAlarm,
       location,
       memo,
-      careAssignmentId: selectedCaregiver,
+      isShared,
+      careAssignment,
+      careAssignmentId: selectedProfile,
+      category,
     };
 
     try {
